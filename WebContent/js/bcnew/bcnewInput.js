@@ -2,7 +2,7 @@
  * 
  */
 
-define(["bcnewentity"], function (bcnewentity){
+define(["bcnewEntity"], function (bcnewEntity){
 
 	var BSJS_Input_MouseState = {};
 	BSJS_Input_MouseState.Release = 0;
@@ -19,7 +19,7 @@ define(["bcnewentity"], function (bcnewentity){
 	BSJS_Input_KeyState.Hold = 4;
 	
 	function Input(offsetX, offsetY){
-		bcnewentity.Entity.call(this, "InputService");
+		bcnewEntity.Entity.call(this, "InputService");
 
 		this.name = "InputService";
 		this.offsetX = offsetX;
@@ -29,7 +29,7 @@ define(["bcnewentity"], function (bcnewentity){
 		this.mousePos = {x:0,y:0};
 		this.keyCode = null;
 	}
-	Input.prototype = new bcnewentity.Entity();	
+	Input.prototype = new bcnewEntity.Entity();	
 	
 	var toMousePos = function(event, x, y){
 		finalX = event.clientX-x;

@@ -5,7 +5,7 @@
 define(function (){
 	
 	function Entity(name){
-		this.name = name | "service";
+		this.name = name | "entity";
 	};
 	
 	Entity.prototype.getName = function(){

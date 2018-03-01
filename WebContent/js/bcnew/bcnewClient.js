@@ -2,16 +2,16 @@
  * 
  */
 
-define(["bcnewinput"], function (bcnewinput){
+define(["bcnewInput"], function (bcnewInput){
 	
-	function Core(){
+	function Client(){
 		this.canvas = null;
 		this.input = null;
 		this.serviceArray = new Array();
 		this.mainLoopId = null;
 	}
 	
-	Core.prototype.initCanvas = function (x, y, width, height){
+	Client.prototype.initCanvas = function (x, y, width, height){
 		this.canvas = document.getElementById("main");
 		if (this.canvas == null){
 			return false;
@@ -24,7 +24,7 @@ define(["bcnewinput"], function (bcnewinput){
 		this.canvas.style.top = "0px";
 		this.canvas.width = width;
 		this.canvas.height = height;
-		this.input = new bcnewinput.Input(x, y);
+		this.input = new bcnewInput.Input(x, y);
 		if (this.input == null){
 			return false;
 		}
@@ -33,7 +33,7 @@ define(["bcnewinput"], function (bcnewinput){
 		return true;
 	}
 	
-	Core.prototype.findService = function (service){
+	Client.prototype.findService = function (service){
 		for (var idx = 0; idx < this.serviceArray.length; ++idx){
 			if (this.serviceArray[idx] == service){
 				return idx;
@@ -42,7 +42,7 @@ define(["bcnewinput"], function (bcnewinput){
 		return -1;
 	}
 	
-	Core.prototype.findServiceByName = function (name){
+	Client.prototype.findServiceByName = function (name){
 		for (var idx = 0; idx < this.serviceArray.length; ++idx){
 			if (this.serviceArray[idx].getName() == name){
 				return idx;
@@ -51,7 +51,7 @@ define(["bcnewinput"], function (bcnewinput){
 		return -1;
 	}
 	
-	Core.prototype.regService = function (service){
+	Client.prototype.regService = function (service){
 		var idx = this.findService(service);
 		if (idx == -1){
 			service.init();
@@ -63,7 +63,7 @@ define(["bcnewinput"], function (bcnewinput){
 		}
 	}
 	
-	Core.prototype.unregService = function (service){
+	Client.prototype.unregService = function (service){
 		var idx = this.findService(service);
 		if (idx >= 0){
 			this.serviceArray.splice(idx, 1);
@@ -71,7 +71,7 @@ define(["bcnewinput"], function (bcnewinput){
 		}
 	}
 	
-	Core.prototype.unregServiceByName = function (name){
+	Client.prototype.unregServiceByName = function (name){
 		var idx = this.findServiceByName(name);
 		if (idx >= 0){
 			var service = this.serviceArray[idx];
@@ -80,7 +80,7 @@ define(["bcnewinput"], function (bcnewinput){
 		}
 	}
 	
-	Core.prototype.update = function (){
+	Client.prototype.update = function (){
 		for (var idx = 0; idx < this.serviceArray.length; ++idx){
 			if (this.serviceArray[idx] != null){
 				this.serviceArray[idx].update();
@@ -93,39 +93,7 @@ define(["bcnewinput"], function (bcnewinput){
 		}
 	}
 	
-	function init(x, y, width, height){
-		window.core = new Core();
-		core.initCanvas(0,0,500,800);
-	}
-	
-	function regService(service){
-		core.regService(service);
-	}
-	
-	function unregService(service){
-		core.unregService(service);
-	}
-	
-	function findService(name){
-		return core.findServiceByName(name);
-	}
-	
-	function startMainLoop(){
-		core.mainLoopId = setInterval(function() {
-			core.update();
-		}, 40);
-	}
-	
-	function stopMainLoop(){
-		clearInterval(core.mainLoopId);
-	}
-	
 	return {
-		init : init,
-		regService : regService,
-		unregService : unregService,
-		findService : findService,
-		startMainLoop : startMainLoop,
-		stopMainLoop : stopMainLoop
+		Client : Client
 	}
 });
