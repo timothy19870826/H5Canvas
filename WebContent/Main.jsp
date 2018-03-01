@@ -9,8 +9,7 @@
 </head>
 <body>
 	<canvas id="main" onmousedown="" >Here is canvas</canvas>
-	<script type="text/javascript">
-	</script>
+	<script type="text/javascript" src="js/require.js" defer async data-main="js/main"></script>
 	<script type="text/javascript">
 		var core = new BCJSCore();
 		if (core.initCanvas(500, 800)){
