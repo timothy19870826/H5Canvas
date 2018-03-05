@@ -2,16 +2,17 @@
  * 
  */
 
-define(["bcnewInput"], function (bcnewInput){
+define(["bcnewEntity", "bcnewRender", "bcnewInput"], function (bcnewEntity, bcnewRender, bcnewInput){
 	
 	function Client(){
 		this.canvas = null;
-		this.input = null;
-		this.serviceArray = new Array();
 		this.mainLoopId = null;
+		window.bcnServiceCenter = new bcnewEntity.ServiceCenter();
+		window.bcnGameObjectMng = new bcnewEntity.GameObject("root");
 	}
 	
 	Client.prototype.initCanvas = function (x, y, width, height){
+		
 		this.canvas = document.getElementById("main");
 		if (this.canvas == null){
 			return false;
@@ -24,76 +25,47 @@ define(["bcnewInput"], function (bcnewInput){
 		this.canvas.style.top = "0px";
 		this.canvas.width = width;
 		this.canvas.height = height;
-		this.input = new bcnewInput.Input(x, y);
-		if (this.input == null){
-			return false;
-		}
-		this.regService(this.input);
-		this.canvas.onmousedown = this.input.onMouseDown;
+		var bcnRenderService = new bcnewRender.RenderService(this.canvas);
+		var bcnInput = new bcnewInput.Input(x, y);
+		bcnServiceCenter.regService(bcnInput);
+		bcnServiceCenter.regService(bcnRenderService);
+		this.canvas.onmousedown = bcnInput.onMouseDown;
 		return true;
-	}
-	
-	Client.prototype.findService = function (service){
-		for (var idx = 0; idx < this.serviceArray.length; ++idx){
-			if (this.serviceArray[idx] == service){
-				return idx;
-			}
-		}
-		return -1;
-	}
-	
-	Client.prototype.findServiceByName = function (name){
-		for (var idx = 0; idx < this.serviceArray.length; ++idx){
-			if (this.serviceArray[idx].getName() == name){
-				return idx;
-			}
-		}
-		return -1;
-	}
-	
-	Client.prototype.regService = function (service){
-		var idx = this.findService(service);
-		if (idx == -1){
-			service.init();
-			alert("service:" + service.getName());
-			this.serviceArray.push(service);
-		}
-		else {
-			throw service.getName() + "has registed";
-		}
-	}
-	
-	Client.prototype.unregService = function (service){
-		var idx = this.findService(service);
-		if (idx >= 0){
-			this.serviceArray.splice(idx, 1);
-			service.destroy();
-		}
-	}
-	
-	Client.prototype.unregServiceByName = function (name){
-		var idx = this.findServiceByName(name);
-		if (idx >= 0){
-			var service = this.serviceArray[idx];
-			this.serviceArray.splice(idx, 1);
-			service.destroy();
-		}
-	}
+	}	
 	
 	Client.prototype.update = function (){
-		for (var idx = 0; idx < this.serviceArray.length; ++idx){
-			if (this.serviceArray[idx] != null){
-				this.serviceArray[idx].update();
-			}
-		}
-		for (var idx = 0; idx < this.serviceArray.length; ++idx){
-			if (this.serviceArray[idx] != null){
-				this.serviceArray[idx].lateUpdate();
-			}
-		}
+		bcnServiceCenter.update();
+		bcnGameObjectMng.update();
+		bcnServiceCenter.lateUpdate();
+		bcnGameObjectMng.lateUpdate();
+	}
+	
+	function init(x, y, width, height){
+		window.bcnClient = new Client();
+		bcnClient.initCanvas(0,0,500,800);
+	}
+	
+	function startMainLoop(){
+		bcnClient.mainLoopId = setInterval(function() {
+			bcnClient.update();
+		}, 40);
+	}
+	
+	function stopMainLoop(){
+		clearInterval(bcnClient.mainLoopId);
 	}
 	
 	return {
-		Client : Client
+		init : init,
+		startMainLoop : startMainLoop,
+		stopMainLoop : stopMainLoop
+	}
+	
+	
+	return {
+		Client : Client,
+		init : init,
+		startMainLoop : startMainLoop,
+		stopMainLoop : stopMainLoop
 	}
 });

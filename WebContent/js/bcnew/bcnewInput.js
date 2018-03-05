@@ -21,13 +21,20 @@ define(["bcnewEntity"], function (bcnewEntity){
 	function Input(offsetX, offsetY){
 		bcnewEntity.Entity.call(this, "InputService");
 
-		this.name = "InputService";
+		this.typeName = "InputService";
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
 		this.mouseState = BSJS_Input_MouseState.Release;
 		this.keyState = BSJS_Input_KeyState.Release;
 		this.mousePos = {x:0,y:0};
 		this.keyCode = null;
+		if (window.bcnInput == null){
+			window.bcnInput = this;
+		}
+		else {
+			throw "InputService registed";
+		}
+			
 	}
 	Input.prototype = new bcnewEntity.Entity();	
 	
@@ -65,7 +72,7 @@ define(["bcnewEntity"], function (bcnewEntity){
 		return this.mouseState == BSJS_Input_MouseState.Hold;
 	}
 	
-	Input.prototype.update = function() {
+	Input.prototype.onUpdate = function() {
 		var d = new Date()
 		console.log(d.getTime());
 		if (this.mouseState == BSJS_Input_MouseState.Down){
@@ -108,7 +115,7 @@ define(["bcnewEntity"], function (bcnewEntity){
 		this.mouseState = BSJS_Input_KeyState.Up;					
 	};
 	
-	Input.prototype.destroy = function() {
+	Input.prototype.onDestroy = function() {
 		console.log("input servce destory");
 	};
 	
