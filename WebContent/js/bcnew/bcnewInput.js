@@ -2,7 +2,7 @@
  * 
  */
 
-define(["bcnewEntity"], function (bcnewEntity){
+define(["bcnew/bcnewEntity"], function (bcnewEntity){
 
 	var BSJS_Input_MouseState = {};
 	BSJS_Input_MouseState.Release = 0;

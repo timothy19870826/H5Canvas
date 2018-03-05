@@ -1,7 +1,7 @@
 /**
  * 
  */
-define(["bcnewEntity"], function(bcnewEntity) {
+define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 
 	var AssetType = {};
 	AssetType.none = 0;

@@ -2,7 +2,7 @@
  * 
  */
 
-define(["bcnewEntity", "bcnewResource"], function(bcnewEntity, bcnewResource) {
+define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnewResource) {
 
 	
 	function Sprite(asset, x, y, width, height){

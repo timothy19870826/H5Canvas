@@ -2,7 +2,7 @@
  * 
  */
 
-define(["bcnewEntity", "bcnewResource", "bcnewRender", "bcnewInput"], function (bcnewEntity, bcnewResource, bcnewRender, bcnewInput){
+define(["bcnew/bcnewEntity", "bcnew/bcnewResource", "bcnew/bcnewRender", "bcnew/bcnewInput"], function (bcnewEntity, bcnewResource, bcnewRender, bcnewInput){
 	
 	function Client(){
 		this.canvas = null;

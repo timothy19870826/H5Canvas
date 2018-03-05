@@ -3,10 +3,10 @@
  */
 
 require.config({
-	baseUrl:"js/bcnew",
+	baseUrl:"js",
 });
 
-require(["bcnewEntity", "bcnewResource", "bcnewRender", "bcnewClient"], function (bcnewEntity, bcnewResource, bcnewRender, bcnewClient){
+require(["bcnew/bcnewEntity", "bcnew/bcnewResource", "bcnew/bcnewRender", "bcnew/bcnewClient"], function (bcnewEntity, bcnewResource, bcnewRender, bcnewClient){
 	bcnewClient.init(0, 0, 500, 800);
 	bcnewClient.startMainLoop();
 	var bg = new bcnewEntity.GameObject();
