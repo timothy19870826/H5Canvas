@@ -261,20 +261,11 @@ define(function (){
 		}
 	}
 	
-	function Sprite(image, x, y, width, height){
-		this.image = image;
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-	}
-	
 	return {
 		Entity : Entity,
 		ServiceCenter : ServiceCenter,
 		Component : Component,
-		GameObject : GameObject,
-		Sprite : Sprite
+		GameObject : GameObject
 		};
 	
 });

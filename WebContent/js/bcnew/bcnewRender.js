@@ -2,7 +2,34 @@
  * 
  */
 
-define(["bcnewEntity"], function(bcnewEntity) {
+define(["bcnewEntity", "bcnewResource"], function(bcnewEntity, bcnewResource) {
+
+	
+	function Sprite(asset, x, y, width, height){
+		this.asset = asset;
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
+	
+	Sprite.prototype.autoSize = function() {
+		if (this.width == null || this.height == null || this.width == 0 || this.height == 0) {
+			console.log(this.asset);
+			if (this.asset.isReady()){
+				this.width = this.asset.image.width;
+				this.height = this.asset.image.height;
+			}
+		}
+	}
+	
+	Sprite.prototype.isReady = function() {
+		return this.asset != null && this.asset.ready;
+	}
+	
+	Sprite.prototype.getImage = function() {
+		return this.asset.image;
+	}
 	
 	function Renderer(id){
 		bcnewEntity.Component.call(this, "Renderer");
@@ -87,8 +114,9 @@ define(["bcnewEntity"], function(bcnewEntity) {
 	
 	Renderer.prototype.render = function(context) {
 		// renderer
-		if (this.sprite != null){
-			context.drawImage(this.sprite.image, 
+		if (this.sprite != null && this.sprite.isReady){
+			this.sprite.autoSize();
+			context.drawImage(this.sprite.getImage(), 
 					this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height,
 					this.x, this.y, this.width, this.height);
 		}
@@ -154,6 +182,7 @@ define(["bcnewEntity"], function(bcnewEntity) {
 	
 	return {
 		RenderService : RenderService,
-		Renderer : Renderer
+		Renderer : Renderer,
+		Sprite : Sprite
 	}
-})
+});

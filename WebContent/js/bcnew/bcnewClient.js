@@ -2,13 +2,14 @@
  * 
  */
 
-define(["bcnewEntity", "bcnewRender", "bcnewInput"], function (bcnewEntity, bcnewRender, bcnewInput){
+define(["bcnewEntity", "bcnewResource", "bcnewRender", "bcnewInput"], function (bcnewEntity, bcnewResource, bcnewRender, bcnewInput){
 	
 	function Client(){
 		this.canvas = null;
 		this.mainLoopId = null;
 		window.bcnServiceCenter = new bcnewEntity.ServiceCenter();
 		window.bcnGameObjectMng = new bcnewEntity.GameObject("root");
+		bcnServiceCenter.regService(new bcnewResource.ResourceMng());
 	}
 	
 	Client.prototype.initCanvas = function (x, y, width, height){

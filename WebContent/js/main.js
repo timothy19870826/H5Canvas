@@ -6,15 +6,14 @@ require.config({
 	baseUrl:"js/bcnew",
 });
 
-require(["bcnewEntity", "bcnewRender", "bcnewClient"], function (bcnewEntity, bcnewRender, bcnewClient){
+require(["bcnewEntity", "bcnewResource", "bcnewRender", "bcnewClient"], function (bcnewEntity, bcnewResource, bcnewRender, bcnewClient){
 	bcnewClient.init(0, 0, 500, 800);
 	bcnewClient.startMainLoop();
 	var bg = new bcnewEntity.GameObject();
-	var image = new Image();
-	image.src = "Images/zy_xyz.png";
-	var sprite = new bcnewEntity.Sprite(image, 0, 0, image.width, image.height);
+	var imgAsset = bcnResourceMng.loadAsset("Images/zy_xyz.png");
+	var sprite = new bcnewRender.Sprite(imgAsset, 0, 0, 0, 0);
 	var renderer = new bcnewRender.Renderer();
-	renderer.setSize(200,200);
+	renderer.setSize(200,268);
 	renderer.setSprite(sprite);
 	bg.addComp(renderer);
 });

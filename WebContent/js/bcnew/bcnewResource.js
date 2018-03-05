@@ -1,30 +1,41 @@
 /**
  * 
  */
-define("bcnewEntity", function (bcnewEntity){
+define(["bcnewEntity"], function(bcnewEntity) {
 
+	var AssetType = {};
+	AssetType.none = 0;
+	AssetType.image = 1;
+	AssetType.audio = 2;
 	
-	var ResAssetType = {};
-	ResAssetType.None = 0;
-	ResAssetType.Image = 1;
-	ResAssetType.Audio = 2;
-	ResAssetType.Max = 3;
-	
-	function ResAsset(assetType, src){
+	function ResAsset(assetType){
 		this.assetType = assetType;
-		this.src = src;
 		this.ref = 1;
-		if (this.assetType == ResAssetType.Image){
-			this.image = new Image();
-			this.image.src = src;
-		}
-		else if (this.assetType == ResAssetType.Audio){
-			
-		}
 	}
 	
 	ResAsset.prototype.release = function() {
-		
+		this.ref--;
+		if (this.ref <= 0 && bcnResourceMng != null){
+			bcnResourceMng.clearAsset(this);
+		}
+	}
+
+	function ImageAsset(src){
+		ResAsset.call(this, AssetType.image);
+		this.assetType = AssetType.image;
+		this.src = src;
+		this.ref = 1;
+		this.image = new Image();
+		this.image.onload = function() {
+			this.ready = true;
+		};
+		this.image.src = src;
+	}
+	
+	ImageAsset.prototype = new ResAsset();
+	
+	ImageAsset.prototype.isReady = function() {
+		return this.image.ready;
 	}
 	
 	function ResourceMng(){
@@ -51,18 +62,37 @@ define("bcnewEntity", function (bcnewEntity){
 		return null;
 	}
 	
-	ResourceMng.prototype.loadImage = function(src) {
+	ResourceMng.prototype.loadAsset = function(src) {
 		var asset = this.findAsset(src);
 		if (asset != null){
 			asset.ref++;
 			return asset;
 		}
-		asset = new ResAsset(ResAssetType.Image, src);
+		asset = new ImageAsset(src);
 		this.assetArr.push(asset);
 		return asset;
 	} 
 	
+	ResourceMng.prototype.clearAsset = function(asset) {
+		//
+		var idx = this.assetArr.indexOf(asset);
+		if (idx >= 0){
+			this.assetArr.splice(idx, 1);
+		}
+	}
+	
 	ResourceMng.prototype.clearUnuseAsset = function() {
 		//
+		for (var idx = this.assetArr.length - 1; idx >= 0; idx--){
+			if (this.assetArr[idx].ref <= 0){
+				this.assetArr.splice(idx, 1);
+			}
+		}
+	}
+	
+	return {
+		ResAsset : ResAsset,
+		ImageAsset : ImageAsset,
+		ResourceMng : ResourceMng
 	}
 })
