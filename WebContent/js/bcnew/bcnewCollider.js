@@ -40,6 +40,13 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		return this.bound;
 	}
 	
+	Collider.prototype.isContainPoint = function(x, y) {
+		return x > this.bound.x && 
+		y > this.bound.y && 
+		x - this.bound.x < this.bound.width && 
+		y - this.bound.y < this.bound.height;
+	}
+	
 	function ColliderMng(){
 		bcnewEntity.Entity.call(this, "ColliderMng");
 		this.colliderArr = new Array();
@@ -67,11 +74,15 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	}
 	
 	ColliderMng.prototype.isInCollider = function(pos) {
-		
-	}
-	
-	ColliderMng.prototype.isCollider = function(colliderA, colliderB) {
-		
+		this.colliderArr.sort(function(l, r) {
+			return l.gameobject.transform.getPosition().y - r.gameobject.transform.getPosition().y
+		});
+		for (var idx = this.colliderArr.length - 1; idx >= 0; --idx){
+			if (this.colliderArr[idx].isContainPoint(pos.x, pos.y)){
+				return this.colliderArr[idx];
+			}
+		}
+		return null;
 	}
 	
 	return {

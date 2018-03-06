@@ -162,6 +162,9 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 	
 	RenderService.prototype.onLateUpdate = function() {
 		// sort
+		this.rendererArr.sort(function(l, r) {
+			return l.gameobject.transform.getPosition().y - r.gameobject.transform.getPosition().y
+		})
 		// render
 		if (this.canvas == null){
 			return;

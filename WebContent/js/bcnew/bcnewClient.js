@@ -25,8 +25,10 @@ function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 		this.canvas.style.borderColor = "#000000";
 		this.canvas.style.borderStyle = "solid";
 		this.canvas.style.position = "absolute";
-		this.canvas.style.left = "0px";
-		this.canvas.style.top = "0px";
+		this.canvas.style.left = x + "px";
+		this.canvas.style.top = y + "px";
+		this.canvas.x = x;
+		this.canvas.y = y;
 		this.canvas.width = width;
 		this.canvas.height = height;
 		bcnInput.bindCanvas(this.canvas);
@@ -42,7 +44,7 @@ function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 	
 	function init(x, y, width, height){
 		window.bcnClient = new Client();
-		bcnClient.initCanvas(0,0,500,800);
+		bcnClient.initCanvas(x,y,500,800);
 	}
 	
 	function startMainLoop(){

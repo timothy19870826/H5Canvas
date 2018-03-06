@@ -94,7 +94,7 @@ define(function (){
 		var idx = this.findService(service);
 		if (idx == -1){
 			service.init();
-			alert("service:" + service.getTypeName());
+			//alert("service:" + service.getTypeName());
 			this.serviceArray.push(service);
 		}
 		else {

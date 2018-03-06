@@ -1,8 +1,8 @@
 /**
  * 
  */
-define(["bcnew/bcnewEntity", "bcnew/bcnewGameObject", "bcnew/bcnewResource", "bcnew/bcnewRender"], 
-function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender){
+define(["bcnew/bcnew"], 
+function (bcnew){
 	
 	function GameLogic(){
 		bcnewEntity.Entity.call(this, "GameLogic");
@@ -27,7 +27,7 @@ function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender){
 			this.dog.transform.position.x = this.dog.transform.position.x + 100;
 		}
 	}
-	
+
 	return {
 		GameLogic : GameLogic
 	}
