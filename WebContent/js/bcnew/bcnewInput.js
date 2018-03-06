@@ -3,6 +3,10 @@
  */
 
 define(["bcnew/bcnewEntity"], function (bcnewEntity){
+	
+	var BSJS_Input_Delay = {};
+	BSJS_Input_Delay.keyDelay = 1;
+	BSJS_Input_Delay.mouseDelay = 1;
 
 	var BSJS_Input_MouseState = {};
 	BSJS_Input_MouseState.Release = 0;
@@ -18,16 +22,10 @@ define(["bcnew/bcnewEntity"], function (bcnewEntity){
 	BSJS_Input_KeyState.Click = 3;
 	BSJS_Input_KeyState.Hold = 4;
 	
-	function Input(offsetX, offsetY){
+	function Input(){
 		bcnewEntity.Entity.call(this, "InputService");
-
 		this.typeName = "InputService";
-		this.offsetX = offsetX;
-		this.offsetY = offsetY;
-		this.mouseState = BSJS_Input_MouseState.Release;
-		this.keyState = BSJS_Input_KeyState.Release;
-		this.mousePos = {x:0,y:0};
-		this.keyCode = null;
+		this.canvas = null;
 		if (window.bcnInput == null){
 			window.bcnInput = this;
 		}
@@ -38,85 +36,101 @@ define(["bcnew/bcnewEntity"], function (bcnewEntity){
 	}
 	Input.prototype = new bcnewEntity.Entity();	
 	
-	var toMousePos = function(event, x, y){
-		finalX = event.clientX-x;
-		finalY = event.clientY-y;
-		return {x:event.clientX, y:event.clientY};
-	};
-	
-	var toKeyCode = function(event){
-		return event.key;
-	};
+	Input.prototype.bindCanvas = function(canvas) {
+		this.canvas = canvas;
+		this.canvas.keyCode = 0;
+		this.canvas.keyState = BSJS_Input_KeyState.Release;
+		this.canvas.mouseState = BSJS_Input_MouseState.Release;
+		this.canvas.mousePos = new bcnewEntity.Vector2(0, 0);
+
+		this.canvas.onmousedown = onMouseDown;
+		this.canvas.onmouseup = onMouseUp;
+		this.canvas.onmousemove = onMouseMove;
+		this.canvas.onkeydown = onKeyDown;
+		this.canvas.onkeyup = onKeyUp;
+		
+		this.mouseDelay = 0;
+		this.keyDelay = 0;
+	}
 	
 	Input.prototype.isKeyDown = function(key){
-		return this.keyState == BSJS_Input_KeyState.Down && this.keyCode == key;
+		return this.canvas.keyState == BSJS_Input_KeyState.Down && this.canvas.keyCode == key;
 	};
 	
 	Input.prototype.isKeyUp = function(key){
-		return this.keyState == BSJS_Input_KeyState.Up && this.keyCode == key;
+		return this.canvas.keyState == BSJS_Input_KeyState.Up && this.canvas.keyCode == key;
 	};
 	
 	Input.prototype.isKeyHold = function(key){
-		return this.keyState == BSJS_Input_KeyState.Hold && this.keyCode == key;
+		return this.canvas.keyState == BSJS_Input_KeyState.Hold && this.canvas.keyCode == key;
 	};
 	
 	Input.prototype.isMouseDown = function(){
-		return this.mouseState == BSJS_Input_MouseState.Down;
+		return this.canvas.mouseState == BSJS_Input_MouseState.Down;
 	};
 	
 	Input.prototype.isMouseUp = function(){
-		return this.mouseState == BSJS_Input_MouseState.Up;
+		return this.canvas.mouseState == BSJS_Input_MouseState.Up;
 	};
 	
 	Input.prototype.isMouseHold = function(){
-		return this.mouseState == BSJS_Input_MouseState.Hold;
+		return this.canvas.mouseState == BSJS_Input_MouseState.Hold;
 	}
 	
-	Input.prototype.onUpdate = function() {
-		var d = new Date()
-		console.log(d.getTime());
-		if (this.mouseState == BSJS_Input_MouseState.Down){
-			this.mouseState = BSJS_Input_MouseState.Hold;
+	Input.prototype.resetState = function() {
+		if (this.canvas.mouseState == BSJS_Input_MouseState.Down){
+			this.canvas.mouseState = BSJS_Input_MouseState.Hold;
 		}
-		else if (this.mouseState == BSJS_Input_MouseState.Up){
-			this.mouseState = BSJS_Input_MouseState.Release;
+		else if (this.canvas.mouseState == BSJS_Input_MouseState.Up){
+			if (this.mouseDelay == 0){
+				this.mouseDelay = BSJS_Input_Delay.mouseDelay;
+				this.canvas.mouseState = BSJS_Input_MouseState.Release;
+			}
+			this.mouseDelay--;
 		}
 
-		if (this.keyState == BSJS_Input_KeyState.Down){
-			this.keyState = BSJS_Input_KeyState.Hold;
+		if (this.canvas.keyState == BSJS_Input_KeyState.Down){
+			this.canvas.keyState = BSJS_Input_KeyState.Hold;
 		}
-		else if (this.keyState == BSJS_Input_KeyState.Up){
-			this.keyState = BSJS_Input_KeyState.Release;
+		else if (this.canvas.keyState == BSJS_Input_KeyState.Up){
+			if (this.keyDelay == 0){
+				this.keyDelay = BSJS_Input_Delay.keyDelay;
+				this.canvas.keyState = BSJS_Input_KeyState.Release;
+			}
+			this.keyDelay--;
 		}
-	};
-	
-	Input.prototype.onMouseDown = function(event) {		
-		this.mousePos = toMousePos(event, this.offsetX, this.offsetY);
-		this.mouseState = BSJS_Input_MouseState.Down;
-		console.log("x:" + this.mousePos.x + ",y:" + this.mousePos.y);
-	};
-	
-	Input.prototype.onMouseUp = function(event) {
-		this.mousePos = toMousePos(event, this.offsetX, this.offsetY);
-		this.mouseState = BSJS_Input_MouseState.Up;				
-	};
-	
-	Input.prototype.onMouseMove = function(event) {
-		this.mousePos = toMousePos(event, this.offsetX, this.offsetY);
-	};
-	
-	Input.prototype.onKeyDown = function(event) {
-		this.keyCode = toKeyCode(event);
-		this.mouseState = BSJS_Input_KeyState.Down;
-	};
-	
-	Input.prototype.onKeyUp = function(event) {
-		this.keyCode = toKeyCode(event);
-		this.mouseState = BSJS_Input_KeyState.Up;					
 	};
 	
 	Input.prototype.onDestroy = function() {
 		console.log("input servce destory");
+	};
+	
+	onMouseDown = function(event) {		
+		this.mousePos.x = event.clientX;
+		this.mousePos.y = event.clientY;
+		this.mouseState = BSJS_Input_MouseState.Down;
+	};
+	
+	onMouseUp = function(event) {
+		this.mousePos.x = event.clientX;
+		this.mousePos.y = event.clientY;
+		this.mouseState = BSJS_Input_MouseState.Up;		
+		console.log("x:" + this.mousePos.x + ",y:" + this.mousePos.y);		
+	};
+	
+	onMouseMove = function(event) {
+		this.mousePos.x = event.clientX;
+		this.mousePos.y = event.clientY;
+	};
+	
+	onKeyDown = function(event) {
+		this.keyCode = event.key;
+		this.mouseState = BSJS_Input_KeyState.Down;
+	};
+	
+	onKeyUp = function(event) {
+		this.keyCode = event.key;
+		this.mouseState = BSJS_Input_KeyState.Up;					
 	};
 	
 	return {

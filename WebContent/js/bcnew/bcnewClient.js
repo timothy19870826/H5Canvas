@@ -2,13 +2,16 @@
  * 
  */
 
-define(["bcnew/bcnewEntity", "bcnew/bcnewResource", "bcnew/bcnewRender", "bcnew/bcnewInput"], function (bcnewEntity, bcnewResource, bcnewRender, bcnewInput){
+define(["bcnew/bcnewEntity", "bcnew/bcnewGameObject", "bcnew/bcnewResource", "bcnew/bcnewRender", "bcnew/bcnewInput"], 
+function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 	
 	function Client(){
 		this.canvas = null;
 		this.mainLoopId = null;
 		window.bcnServiceCenter = new bcnewEntity.ServiceCenter();
-		window.bcnGameObjectMng = new bcnewEntity.GameObject("root");
+		bcnServiceCenter.regService(new bcnewInput.Input());
+		bcnServiceCenter.regService(new bcnewRender.RenderService());
+		bcnServiceCenter.regService(new bcnewGameObject.GameObjectMng());
 		bcnServiceCenter.regService(new bcnewResource.ResourceMng());
 	}
 	
@@ -26,19 +29,15 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource", "bcnew/bcnewRender", "bcnew/
 		this.canvas.style.top = "0px";
 		this.canvas.width = width;
 		this.canvas.height = height;
-		var bcnRenderService = new bcnewRender.RenderService(this.canvas);
-		var bcnInput = new bcnewInput.Input(x, y);
-		bcnServiceCenter.regService(bcnInput);
-		bcnServiceCenter.regService(bcnRenderService);
-		this.canvas.onmousedown = bcnInput.onMouseDown;
+		bcnInput.bindCanvas(this.canvas);
+		bcnRenderService.bindCanvas(this.canvas);
 		return true;
 	}	
 	
 	Client.prototype.update = function (){
 		bcnServiceCenter.update();
-		bcnGameObjectMng.update();
 		bcnServiceCenter.lateUpdate();
-		bcnGameObjectMng.lateUpdate();
+		bcnInput.resetState();
 	}
 	
 	function init(x, y, width, height){

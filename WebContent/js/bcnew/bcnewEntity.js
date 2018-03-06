@@ -4,66 +4,44 @@
 
 define(function (){
 	
-	function Entity(typeName){
+	function Vector2(x, y){
+		this.x = x;
+		this.y = y;
+	}
+	
+	function Rect(x, y, width, height){
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
+	
+	function Entity(typeName, name){
 		this.typeName = typeName | "entity";
+		this.name = name | this.typeName;
 		this.active = true;
 		this.dead = false;
-		this.parent = null;
-		this.children = new Array();
 	};
+	
+	Entity.prototype.getName = function() {
+		return this.name;
+	}
 	
 	Entity.prototype.getTypeName = function(){
 		return this.typeName;
-	}
-	
-	Entity.prototype.addChild = function(entity){
-		if (this.children.indexOf(entity) == -1){
-			entity.parent = null;
-			this.children.push(entity);
-		}
-	}
-	
-	Entity.prototype.removeChild = function(entity) {
-		var idx = this.children.indexOf(entity);
-		if (idx >= 0){
-			entity.dead = true;
-		}
 	}
 
 	Entity.prototype.init = function(){
 		console.log(this.typeName + "init");
 		this.onInit();
-	};
+	};	
 	
 	Entity.prototype.update = function(){
 		this.onUpdate();
-		if (this.children.length == 0){
-			return;
-		}
-		for (var idx = this.children.length - 1; idx >= 0; --idx){
-			if (this.children[idx].dead){
-				this.children.splice(idx, 1);
-			}
-			else if (this.children[idx].active){
-				this.children[idx].update();
-			}
-		}
 	};
 	
 	Entity.prototype.lateUpdate = function(){
 		this.onLateUpdate();
-		if (this.children.length == 0){
-			return;
-		}
-		for (var idx = this.children.length - 1; idx >= 0; --idx){
-			if (this.children[idx].dead){
-				this.children[idx].parent = null;
-				this.children.splice(idx, 1);
-			}
-			else if (this.children[idx].active){
-				this.children[idx].lateUpdate();
-			}
-		}
 	};
 	
 	Entity.prototype.destroy = function(){
@@ -80,7 +58,7 @@ define(function (){
 	}
 	
 	Entity.prototype.onLateUpdate = function() {
-		
+		//console.log("update");
 	}
 	
 	Entity.prototype.onDestroy = function() {
@@ -174,16 +152,11 @@ define(function (){
 		this.typeName = typeName | "Component";
 		this.active = true;
 		this.dead = false;
-		this.parent = null;
-		this.single = true;
+		this.gameobject = null;
 	}
 	
 	Component.prototype.getTypeName = function(){
 		return this.typeName;
-	}
-	
-	Component.prototype.isSingle = function() {
-		return this.single;
 	}
 
 	Component.prototype.init = function(){
@@ -200,72 +173,12 @@ define(function (){
 		console.log("destroy");
 	};
 	
-
-	function GameObject(name){
-		Entity.call(this, "GameObject");
-		this.typeName = "GameObject";
-		this.name = name | "GameObject";
-		this.compArr = new Array();
-	}
-
-	GameObject.prototype = new Entity();
-	
-	GameObject.prototype.addComp = function(component) {
-		if (component.isSingle() && this.compArr.indexOf(component) >= 0){
-			return;
-		}
-		this.compArr.push(component);
-		component.init();
-	}
-	
-	GameObject.prototype.removeComp = function(component) {
-		if (this.compArr.indexOf(component) < 0){
-			return;
-		}
-		component.dead = true;
-	}
-	
-	GameObject.prototype.findCompByName = function(typeName) {
-		
-	}
-	
-	GameObject.prototype.onUpdate = function (){
-		for (var idx = 0; idx < this.compArr.length; ++idx){
-			if (this.compArr[idx] == null){
-				continue;
-			}
-			else if (this.compArr[idx].active && this.compArr[idx].dead == false){
-				this.compArr[idx].update();
-			}
-		}
-	}
-	
-	GameObject.prototype.onLateUpdate = function (){
-		for (var idx = 0; idx < this.compArr.length; ++idx){
-			if (this.compArr[idx] == null){
-				continue;
-			}
-			else if (this.compArr[idx].active && this.compArr[idx].dead == false){
-				this.compArr[idx].lateUpdate();
-			}
-		}
-		for (var idx = this.compArr.length - 1; idx >= 0; --idx){
-			var component = this.compArr[idx];
-			if (component == null){
-				this.compArr.splice(idx, 1);
-			}
-			else if (this.compArr[idx].dead){
-				this.compArr.splice(idx, 1);
-				component.destroy();
-			}
-		}
-	}
-	
 	return {
+		Vector2 : Vector2,
+		Rect : Rect,
 		Entity : Entity,
 		ServiceCenter : ServiceCenter,
-		Component : Component,
-		GameObject : GameObject
+		Component : Component
 		};
 	
 });

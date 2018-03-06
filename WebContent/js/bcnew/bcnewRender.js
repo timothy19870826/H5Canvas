@@ -116,22 +116,20 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 		// renderer
 		if (this.sprite != null && this.sprite.isReady){
 			this.sprite.autoSize();
+			var position = this.gameobject.transform.getPosition();
+			var scale = this.gameobject.transform.getLossyScale();
 			context.drawImage(this.sprite.getImage(), 
 					this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height,
-					this.x, this.y, this.width, this.height);
+					position.x, position.y, this.width * scale.x, this.height * scale.y);
 		}
 	}
 	
-	function RenderService(canvas) {
+	function RenderService() {
 		bcnewEntity.Entity.call(this, "RenderService");
-		this.typeName = "RenderService";
+		this.typeName = "RenderService";		
+		this.rendererArr = new Array();		
+		this.canvas = null;
 		
-		this.rendererArr = new Array();
-		
-		this.canvas = canvas;
-		if (this.canvas == null){
-			throw "invalid canvas";
-		}
 		if (window.bcnRenderMng != null){
 			throw "RenderService registed";
 		}
@@ -142,40 +140,41 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 	
 	RenderService.prototype = new bcnewEntity.Entity();
 	
+	RenderService.prototype.bindCanvas = function(canvas) {
+		this.canvas = canvas;
+		if (this.canvas == null){
+			throw "invalid canvas";
+		}
+	}
+	
 	RenderService.prototype.addRenderer = function(renderer) {
 		if (this.rendererArr.indexOf(renderer) == -1){
 			this.rendererArr.push(renderer);
-			renderer.init();
 		}
 	}
 	
 	RenderService.prototype.removeRenderer = function(renderer) {
 		var index = this.rendererArr.indexOf(renderer);
 		if (index != -1){
-			renderer.dead = true;
+			this.rendererArr.splice(index, 1);
 		}
 	}
 	
 	RenderService.prototype.onLateUpdate = function() {
 		// sort
 		// render
+		if (this.canvas == null){
+			return;
+		}
 		var context = this.canvas.getContext("2d");
+		context.fillStyle="#ffffff";        
+		context.fillRect(0,0,this.canvas.width,this.canvas.height);
 		for (var idx = 0; idx < this.rendererArr.length; ++idx){
 			if (this.rendererArr[idx] == null){
 				continue;
 			}
 			else if (this.rendererArr[idx].active && this.rendererArr[idx].dead == false){
 				this.rendererArr[idx].render(context);
-			}
-		}
-		for (var idx = this.rendererArr.length - 1; idx >= 0; --idx){
-			var renderer = this.rendererArr[idx];
-			if (renderer == null){
-				this.rendererArr.splice(idx, 1);
-			}
-			else if (renderer.dead){
-				this.rendererArr.splice(idx, 1);
-				renderer.destroy();
 			}
 		}
 	}
