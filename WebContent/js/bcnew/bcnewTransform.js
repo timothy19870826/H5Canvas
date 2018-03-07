@@ -9,6 +9,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		//this.rotate = 0;
 		//this.localRotate = 0;
 		*/
+		this.depth = 0;
 		this.changed = false;
 		this.position = new bcnewEntity.Vector2(0, 0);
 		this.localPosition = new bcnewEntity.Vector2(0, 0);

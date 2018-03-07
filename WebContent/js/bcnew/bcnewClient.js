@@ -2,8 +2,8 @@
  * 
  */
 
-define(["bcnew/bcnewEntity", "bcnew/bcnewGameObject", "bcnew/bcnewResource", "bcnew/bcnewRender", "bcnew/bcnewInput"], 
-function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
+define(["bcnew/bcnewEntity", "bcnew/bcnewCollider", "bcnew/bcnewGameObject", "bcnew/bcnewResource", "bcnew/bcnewRender", "bcnew/bcnewInput"], 
+function (bcnewEntity, bcnewCollider, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 	
 	function Client(){
 		this.canvas = null;
@@ -14,9 +14,10 @@ function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 		bcnServiceCenter.regService(new bcnewRender.RenderService());
 		bcnServiceCenter.regService(new bcnewGameObject.GameObjectMng());
 		bcnServiceCenter.regService(new bcnewResource.ResourceMng());
+		bcnServiceCenter.regService(new bcnewCollider.ColliderMng());
 	}
 	
-	Client.prototype.initCanvas = function (x, y, width, height){
+	Client.prototype.initCanvas = function (width, height){
 		
 		this.cache = document.createElement("canvas");
 		this.cache.style.display = "none";
@@ -90,9 +91,9 @@ function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 		bcnInput.resetState();
 	}
 	
-	function init(x, y, width, height){
+	function init(width, height){
 		window.bcnClient = new Client();
-		bcnClient.initCanvas(x,y,500,800);
+		bcnClient.initCanvas(width, height);
 	}
 	
 	function startMainLoop(){

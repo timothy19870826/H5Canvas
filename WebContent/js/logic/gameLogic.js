@@ -5,7 +5,6 @@ define(["bcnew/bcnew"],
 function (bcnew){
 	
 	function GameLogic(){
-		var colliderMng = new bcnewCollider.ColliderMng();
 		bcnewEntity.Entity.call(this, "GameLogic");
 		this.dog = null;
 	}
@@ -17,24 +16,26 @@ function (bcnew){
 		var imgAsset = bcnResourceMng.loadAsset("Images/zy_xyz.png");
 		var sprite = new bcnewRender.Sprite(imgAsset, 0, 0, 0, 0);
 		var renderer = new bcnewRender.Renderer();
-		renderer.setSize(200,268);
 		renderer.setSprite(sprite);
 		this.dog.addComp(renderer);
+		this.dog.render = renderer;
 		var collider = new bcnewCollider.Collider();
-		collider.setBound(0,0,200,268);
+		collider.autoRender = true;
+		collider.onTouchEnd = function() {
+			this.gameobject.transform.position.x = this.gameobject.transform.position.x + 100;
+		}
 		this.dog.addComp(collider);
+		this.dog.collider = collider;
 	}
 	
 	GameLogic.prototype.onUpdate = function() {
+		/*
 		if (bcnInput.isMouseUp()){
-			var collider = bcnColliderMng.isInCollider(bcnewClient.inputPos2Game(bcnInput.getMousePos()));
-			if (collider != null){
-				console.log("collider:" + collider.gameobject.name);
-				 collider.gameobject.transform.position.x =  collider.gameobject.transform.position.x + 100;		
+			var touchPos = bcnewClient.inputPos2Game(bcnInput.getMousePos());
+			if (this.dog.collider.isContainPoint(touchPos)){
+				this.dog.transform.position.x = this.dog.transform.position.x + 100;
 			}
-			console.log("GameLogic  bcnInput.isMouseUp");
-			console.log(bcnInput.getMousePos());
-		}
+		}*/
 	}
 
 	return {

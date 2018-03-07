@@ -36,10 +36,6 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 		this.typeName = "Renderer";
 		this.active = true;
 		this.dead = false;
-		this.x = 0;
-		this.y = 0;
-		this.width = 10;
-		this.height = 10;
 		this.id = id;
 		this.sprite = null;
 	}
@@ -70,48 +66,6 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 		return this.sprite;
 	}
 	
-	Renderer.prototype.setPosX = function(x){
-		this.x = x;
-	}
-	
-	Renderer.prototype.getPosX = function() {
-		return this.x;
-	}
-	
-	Renderer.prototype.setPosY = function(y) {
-		this.y = y;
-	}
-	
-	Renderer.prototype.getPosY = function() {
-		return this.y;
-	}
-	
-	Renderer.prototype.setPos = function(x, y) {
-		this.x = x;
-		this.y = y;
-	}
-	
-	Renderer.prototype.setWidth = function(width) {
-		this.width = width;
-	}
-	
-	Renderer.prototype.getWidth = function() {
-		return this.width;
-	}
-	
-	Renderer.prototype.setHeight = function(height) {
-		this.height = height;
-	}
-	
-	Renderer.prototype.getHeight = function() {
-		return this.height;
-	}
-	
-	Renderer.prototype.setSize = function(width, height) {
-		this.width = width;
-		this.height = height;
-	}
-	
 	Renderer.prototype.render = function(context) {
 		// renderer
 		if (this.sprite != null && this.sprite.isReady){
@@ -120,7 +74,15 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 			var scale = this.gameobject.transform.getLossyScale();
 			context.drawImage(this.sprite.getImage(), 
 					this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height,
-					position.x, position.y, this.width * scale.x, this.height * scale.y);
+					position.x, position.y, this.sprite.width * scale.x, this.sprite.height * scale.y);
+		}
+		if (this.gameobject.collider != null){
+			var bound = this.gameobject.collider.getCurBound();
+			context.strokeRect(
+					bound.x, 
+					bound.y, 
+					bound.width, 
+					bound.height);
 		}
 	}
 	

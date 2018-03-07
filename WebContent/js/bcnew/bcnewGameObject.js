@@ -55,7 +55,9 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 			if (this.compArr[idx] == null){
 				continue;
 			}
-			else if (this.compArr[idx].active && this.compArr[idx].dead == false){
+			else if (this.compArr[idx].active && 
+					this.compArr[idx].dead == false &&
+					this.compArr[idx].update != null){
 				this.compArr[idx].update();
 			}
 		}
@@ -77,7 +79,9 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 			if (this.compArr[idx] == null){
 				continue;
 			}
-			else if (this.compArr[idx].active && this.compArr[idx].dead == false){
+			else if (this.compArr[idx].active && 
+					this.compArr[idx].dead == false &&
+					this.compArr[idx].lateUpdate != null){
 				this.compArr[idx].lateUpdate();
 			}
 		}
