@@ -162,13 +162,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	}
 	
 	ColliderMng.prototype.isInCollider = function(pos) {
-		this.colliderArr.sort(sortCollider);
-		for (var idx = this.colliderArr.length - 1; idx >= 0; --idx){
-			if (this.colliderArr[idx].isContainPoint(pos)){
-				return this.colliderArr[idx];
-			}
-		}
-		return null;
+		return filterCollider(this.colliderArr, pos);
 	}
 	
 	function filterCollider(colliderArr, point){
@@ -187,10 +181,6 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			return null;
 		}
 		return colliderArr[res];
-	}
-	
-	function sortCollider(l, r) {
-		return l.gameobject.transform.getPosition().y - r.gameobject.transform.getPosition().y
 	}
 	
 	return {
