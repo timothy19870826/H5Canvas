@@ -129,6 +129,7 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 		this.typeName = "RenderService";		
 		this.rendererArr = new Array();		
 		this.canvas = null;
+		this.design = null;
 		
 		if (window.bcnRenderMng != null){
 			throw "RenderService registed";
@@ -140,8 +141,9 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 	
 	RenderService.prototype = new bcnewEntity.Entity();
 	
-	RenderService.prototype.bindCanvas = function(canvas) {
+	RenderService.prototype.bindCanvas = function(canvas, design) {
 		this.canvas = canvas;
+		this.design = design;
 		if (this.canvas == null){
 			throw "invalid canvas";
 		}
@@ -169,9 +171,9 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 		if (this.canvas == null){
 			return;
 		}
-		var context = this.canvas.getContext("2d");
+		var context = this.design.getContext("2d");
 		context.fillStyle="#ffffff";        
-		context.fillRect(0,0,this.canvas.width,this.canvas.height);
+		context.fillRect(0,0,this.design.width,this.design.height);
 		for (var idx = 0; idx < this.rendererArr.length; ++idx){
 			if (this.rendererArr[idx] == null){
 				continue;
@@ -180,6 +182,16 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 				this.rendererArr[idx].render(context);
 			}
 		}
+		
+		context = this.canvas.getContext("2d");
+		context.strokeRect(
+				this.canvas.renderArea.x, 
+				this.canvas.renderArea.y, 
+				this.canvas.renderArea.width, 
+				this.canvas.renderArea.height);
+		context.drawImage(this.design, 
+				0, 0, this.design.width, this.design.height,
+				this.canvas.renderArea.x, this.canvas.renderArea.y, this.canvas.renderArea.width, this.canvas.renderArea.height);
 	}
 	
 	return {

@@ -16,6 +16,13 @@ define(function (){
 		this.height = height;
 	}
 	
+	Rect.prototype.containPoint = function(point) {
+		return point.x > this.x && 
+		point.y > this.y && 
+		point.x - this.x < this.width && 
+		point.y - this.y < this.height;
+	}
+	
 	function Entity(typeName, name){
 		this.typeName = typeName | "entity";
 		this.name = name | this.typeName;

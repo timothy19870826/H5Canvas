@@ -26,6 +26,7 @@ define(["bcnew/bcnewEntity"], function (bcnewEntity){
 		bcnewEntity.Entity.call(this, "InputService");
 		this.typeName = "InputService";
 		this.canvas = null;
+		this.mousePos = new bcnewEntity.Vector2(0, 0);
 		if (window.bcnInput == null){
 			window.bcnInput = this;
 		}
@@ -51,6 +52,12 @@ define(["bcnew/bcnewEntity"], function (bcnewEntity){
 		
 		this.mouseDelay = 0;
 		this.keyDelay = 0;
+	}
+	
+	Input.prototype.getMousePos = function() {
+		this.mousePos.x = this.canvas.mousePos.x - this.canvas.renderArea.x;
+		this.mousePos.y = this.canvas.mousePos.y - this.canvas.renderArea.y;
+		return this.mousePos;
 	}
 	
 	Input.prototype.isKeyDown = function(key){

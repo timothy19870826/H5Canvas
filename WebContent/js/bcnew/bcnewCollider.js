@@ -40,11 +40,11 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		return this.bound;
 	}
 	
-	Collider.prototype.isContainPoint = function(x, y) {
-		return x > this.bound.x && 
-		y > this.bound.y && 
-		x - this.bound.x < this.bound.width && 
-		y - this.bound.y < this.bound.height;
+	Collider.prototype.isContainPoint = function(point) {
+		return point.x > this.bound.x + this.gameobject.transform.position.x && 
+		point.y > this.bound.y + this.gameobject.transform.position.x && 
+		point.x - this.bound.x - this.gameobject.transform.position.x < this.bound.width * this.gameobject.transform.lossyScale.x && 
+		point.y - this.bound.y - this.gameobject.transform.position.x < this.bound.height * this.gameobject.transform.lossyScale.y;
 	}
 	
 	function ColliderMng(){
@@ -78,7 +78,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			return l.gameobject.transform.getPosition().y - r.gameobject.transform.getPosition().y
 		});
 		for (var idx = this.colliderArr.length - 1; idx >= 0; --idx){
-			if (this.colliderArr[idx].isContainPoint(pos.x, pos.y)){
+			if (this.colliderArr[idx].isContainPoint(pos)){
 				return this.colliderArr[idx];
 			}
 		}
@@ -86,6 +86,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	}
 	
 	return {
-		Collider : Collider
+		Collider : Collider,
+		ColliderMng : ColliderMng
 	}
 })

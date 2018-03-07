@@ -9,7 +9,7 @@ require.config({
 require(["logic/gameLogic"], 
 function (gameLogic){
 	console.log("init");
-	bcnewClient.init(100, 0, 500, 800);
+	bcnewClient.init(0, 0, 500, 800);
 	bcnewClient.startMainLoop();
 	bcnServiceCenter.regService(new gameLogic.GameLogic());
 });

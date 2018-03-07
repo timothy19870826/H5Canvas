@@ -8,6 +8,7 @@ function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 	function Client(){
 		this.canvas = null;
 		this.mainLoopId = null;
+		this.scale = 1;
 		window.bcnServiceCenter = new bcnewEntity.ServiceCenter();
 		bcnServiceCenter.regService(new bcnewInput.Input());
 		bcnServiceCenter.regService(new bcnewRender.RenderService());
@@ -17,22 +18,69 @@ function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 	
 	Client.prototype.initCanvas = function (x, y, width, height){
 		
-		this.canvas = document.getElementById("main");
-		if (this.canvas == null){
-			return false;
-		}
+		this.cache = document.createElement("canvas");
+		this.cache.style.display = "none";
+		this.cache.style.left = "0px";
+		this.cache.style.top = "0px";
+		this.cache.width = width;
+		this.cache.height = height;
+		document.body.appendChild(this.cache);
+		
+		this.canvas = document.createElement("canvas");
+		document.body.appendChild(this.canvas);
+
 		this.canvas.style.border = "thin";
 		this.canvas.style.borderColor = "#000000";
 		this.canvas.style.borderStyle = "solid";
 		this.canvas.style.position = "absolute";
-		this.canvas.style.left = x + "px";
-		this.canvas.style.top = y + "px";
-		this.canvas.x = x;
-		this.canvas.y = y;
-		this.canvas.width = width;
-		this.canvas.height = height;
+		
+		var clientW = window.innerWidth;
+		var clientH = window.innerHeight;
+		console.log("width:" + clientW + ",height:" + clientH);
+		if (clientH > clientW && height > width){
+			this.scale = clientH / height;
+		}
+		else if (window.innerHeight > clientW && height < width){
+			this.scale = clientW / width;
+		}
+		else if (clientH < clientW && height > width){
+			this.scale = clientH / height;
+		}
+		
+		var renderArea = new bcnewEntity.Rect(0, 0, width * this.scale, height * this.scale);
+		console.log(renderArea);
+		if (renderArea.width < clientW){
+			var offset = (clientW - renderArea.width);
+			if (offset > 2){
+				renderArea.x = offset / 2;
+				console.log("0:" + offset);
+				console.log(renderArea);
+				console.log("width:" + clientW + ",height:" + clientH);
+			}
+			this.canvas.width = clientW;
+		}
+		else{
+			this.canvas.width = renderArea.width;
+		}
+		if (renderArea.height < clientH){
+			var offset = (clientH - renderArea.height);
+			if (offset > 2){
+				renderArea.y = offset / 2;
+				console.log("2:" + offset);
+				console.log(renderArea);
+				console.log("width:" + clientW + ",height:" + clientH);
+			}
+			this.canvas.height = clientH;
+		}
+		else{
+			this.canvas.height = renderArea.height;
+		}
+		this.canvas.style.left = "0px";
+		this.canvas.style.top = "0px";
+		this.canvas.renderArea = renderArea;
 		bcnInput.bindCanvas(this.canvas);
-		bcnRenderService.bindCanvas(this.canvas);
+		bcnRenderService.bindCanvas(this.canvas, this.cache);
+		console.log(renderArea);
 		return true;
 	}	
 	
@@ -57,17 +105,14 @@ function (bcnewEntity, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 		clearInterval(bcnClient.mainLoopId);
 	}
 	
+	function inputPos2Game(pos){
+		return new bcnewEntity.Vector2(pos.x / bcnClient.scale, pos.y / bcnClient.scale);
+	}	
+	
 	return {
 		init : init,
 		startMainLoop : startMainLoop,
-		stopMainLoop : stopMainLoop
-	}
-	
-	
-	return {
-		Client : Client,
-		init : init,
-		startMainLoop : startMainLoop,
-		stopMainLoop : stopMainLoop
+		stopMainLoop : stopMainLoop,
+		inputPos2Game : inputPos2Game
 	}
 });
