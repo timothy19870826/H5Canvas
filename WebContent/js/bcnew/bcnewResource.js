@@ -11,6 +11,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	function ResAsset(assetType){
 		this.assetType = assetType;
 		this.ref = 1;
+		this.src = "";
 	}
 	
 	ResAsset.prototype.release = function() {
@@ -23,12 +24,12 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	function ImageAsset(src){
 		ResAsset.call(this, AssetType.image);
 		this.assetType = AssetType.image;
-		this.src = src;
 		this.ref = 1;
 		this.image = new Image();
 		this.image.onload = function() {
 			this.ready = true;
 		};
+		this.src = src;
 		this.image.src = src;
 	}
 	
@@ -54,9 +55,9 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	ResourceMng.prototype = new bcnewEntity.Entity();
 	
 	ResourceMng.prototype.findAsset = function(src) {
-		for ( var asset in this.assetArr) {
-			if (asset.src == src){
-				return asset;
+		for (var idx = 0; idx < this.assetArr.length; ++idx) {
+			if (this.assetArr[idx].src == src){
+				return this.assetArr[idx];
 			}
 		}
 		return null;

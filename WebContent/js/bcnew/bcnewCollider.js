@@ -9,7 +9,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		this.offset = new bcnewEntity.Vector2(0, 0);
 		this.bound = new bcnewEntity.Rect(0, 0, 100, 100);
 		this.curBound = new bcnewEntity.Rect(0, 0, 100, 100);
-		this.autoRender = false;
+		this.autoCollider = false;
 		this.trigger = true;
 		this.lastTime = 0;
 		this.onTouchStart = null;
@@ -50,21 +50,12 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	Collider.prototype.getCurBound = function() {
 		var position = this.gameobject.transform.getPosition();
 		var scale = this.gameobject.transform.getLossyScale();
-		if (this.autoRender){
-			if (this.gameobject.render == null ||
-				this.gameobject.render.sprite == null ||
-				this.gameobject.render.sprite.isReady == false){
-				this.curBound.x = position.x;
-				this.curBound.y = position.y;
-				this.curBound.width = 1;
-				this.curBound.height = 1;
-				return this.curBound;
-			}
-			var sprite = this.gameobject.render.sprite;
+		if (this.autoCollider){
+			var size = this.gameobject.transform.getSize();
 			this.curBound.x = position.x;
 			this.curBound.y = position.y;
-			this.curBound.width = sprite.width * scale.x;
-			this.curBound.height = sprite.height * scale.y;
+			this.curBound.width = size.x * scale.x;
+			this.curBound.height = size.y * scale.y;
 			return this.curBound;
 		}
 		this.curBound.x = this.bound.x + position.x;
@@ -75,29 +66,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	}
 	
 	Collider.prototype.isContainPoint = function(point) {
-		if (this.autoRender){
-			if (this.gameobject.render == null ||
-				this.gameobject.render.sprite == null ||
-				this.gameobject.render.sprite.isReady == false){
-				console.log("11");
-				return false;
-			}
-			var position = this.gameobject.transform.getPosition();
-			var scale = this.gameobject.transform.getLossyScale();
-			var sprite = this.gameobject.render.sprite;
-			this.curBound.x = position.x;
-			this.curBound.y = position.y;
-			this.curBound.width = sprite.width * scale.x;
-			this.curBound.height = sprite.height * scale.y;
-			return this.curBound.containPoint(point);
-		}
-		var position = this.gameobject.transform.getPosition();
-		var scale = this.gameobject.transform.getLossyScale();
-		this.curBound.x = this.bound.x + position.x;
-		this.curBound.y = this.bound.y + position.y;
-		this.curBound.width = this.bound.width * scale.x;
-		this.curBound.height = this.bound.height * scale.y;		
-		return this.curBound.containPoint(point);
+		return this.getCurBound().containPoint(point);
 	}
 	
 	function ColliderMng(){

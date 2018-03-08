@@ -165,6 +165,17 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 		}
 	}
 	
+	GameObjectMng.prototype.findGameObject = function(path) {
+		var filterArr = path.split("/");
+		var obj = this.transform;
+		for (var idx = 0; idx < filterArr.length; ++idx){
+			obj = obj.findChild(filterArr[idx]);
+			if (obj == null){
+				return null;
+			}
+		}
+	}
+	
 	return {
 		GameObject : GameObject,
 		GameObjectMng : GameObjectMng

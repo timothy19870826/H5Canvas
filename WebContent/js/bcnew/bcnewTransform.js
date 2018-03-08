@@ -10,20 +10,18 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		//this.localRotate = 0;
 		*/
 		this.depth = 0;
-		this.changed = false;
+		this.localDepth = 0;
+		this.size = new bcnewEntity.Vector2(1, 1);
 		this.position = new bcnewEntity.Vector2(0, 0);
 		this.localPosition = new bcnewEntity.Vector2(0, 0);
 		this.lossyScale = new bcnewEntity.Vector2(1, 1);
 		this.localScale = new bcnewEntity.Vector2(1, 1);
 		this.parent = null;
 		this.child = new Array();
+		this.rect = new bcnewEntity.Rect(0, 0, 1, 1);
 	}
 	
 	Transform.prototype = new bcnewEntity.Component();
-	
-	Transform.prototype.hasChanged = function() {
-		return this.changed;
-	}
 	
 	/*
 	Transform.prototype.setRotate = function(rotate) {
@@ -43,12 +41,48 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	}
 	*/
 	
+	Transform.prototype.getRect = function(){
+		var position = this.gameobject.transform.getPosition();
+		var scale = this.gameobject.transform.getLossyScale();
+		var size = this.gameobject.transform.getSize();
+		this.rect.x = position.x;
+		this.rect.y = position.y;
+		this.rect.width = size.x * scale.x;
+		this.rect.height = size.y * scale.y;
+		return this.rect;
+	}
+
+	Transform.prototype.setSize = function(size) {
+		this.size = size;
+	}
+	
+	Transform.prototype.getSize = function() {
+		return this.size;
+	}
+	
+	Transform.prototype.setDepth = function(depth) {
+		this.depth = depth;
+		this.localDepth = this.depth - this.parent.depth;
+	}
+	
+	Transform.prototype.getDepth = function() {
+		return this.depth;
+	}
+	
+	Transform.prototype.setLocalDepth = function(depth) {
+		this.localDepth = depth;
+		this.depth = this.localDepth + this.parent.depth;
+	}
+	
+	Transform.prototype.getLocalDepth = function() {
+		return this.localDepth;
+	}
+	
 	Transform.prototype.setPosition = function(position) {
 		this.position.x = position.x;
 		this.position.y = position.y;
 		this.localPosition.x = position.x - this.parent.position.x;
 		this.localPosition.y = position.y - this.parent.position.y;
-		this.changed = true;
 	}
 	
 	Transform.prototype.getPosition = function() {
@@ -59,7 +93,6 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		this.localPosition = position;
 		this.position.x = position.x + this.parent.position.x;
 		this.position.y = position.y + this.parent.position.y;
-		this.changed = true;
 	}
 	
 	Transform.prototype.getLocalPosition = function() {
@@ -73,7 +106,6 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		this.localScale = scale;
 		this.lossyScale.x = scale.x * this.parent.lossyScale.x;
 		this.lossyScale.y = scale.y * this.parent.lossyScale.y;
-		this.changed = true;
 	}
 	
 	Transform.prototype.getLocalScale = function() {
@@ -100,11 +132,28 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			this.parent = parent;
 		}
 		this.parent.child.push(this);
-		this.localPosition.x = this.position.x - this.parent.position.x;
-		this.localPosition.y = this.position.y - this.parent.position.y;
-		this.localScale.x = this.lossyScale.x / this.parent.lossyScale.x;
-		this.localScale.y = this.lossyScale.y / this.parent.lossyScale.y;
-		this.changed = true;
+		this.forceUpdate();
+	}
+	
+	Transform.prototype.forceUpdate = function() {
+		this.depth = this.localDepth + this.parent.depth;
+		this.position.x = this.localPosition.x + this.parent.position.x;
+		this.position.y = this.localPosition.y + this.parent.position.y;
+		this.lossyScale.x = this.localScale.x * this.parent.lossyScale.x;
+		this.lossyScale.y = this.localScale.y * this.parent.lossyScale.y;
+		for (var idx = 0; idx < this.child.length; ++idx){
+			this.child[idx].forceUpdate();
+		}
+	}
+	
+	Transform.prototype.findChild = function(name) {
+		for (var idx = 0; idx < this.child.length; ++idx){
+			console.log(this.child[idx].gameobject.name);
+			if (this.child[idx].gameobject.name == name){
+				return this.child[idx];
+			}
+		}
+		return null;
 	}
 	
 	Transform.prototype.update = function() {
@@ -113,7 +162,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	
 	Transform.prototype.lateUpdate = function() {
 		
-	}	
+	}
 	
 	return {
 		Transform : Transform

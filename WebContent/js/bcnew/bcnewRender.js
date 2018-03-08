@@ -70,11 +70,10 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 		// renderer
 		if (this.sprite != null && this.sprite.isReady){
 			this.sprite.autoSize();
-			var position = this.gameobject.transform.getPosition();
-			var scale = this.gameobject.transform.getLossyScale();
+			var rect = this.gameobject.transform.getRect();
 			context.drawImage(this.sprite.getImage(), 
 					this.sprite.x, this.sprite.y, this.sprite.width, this.sprite.height,
-					position.x, position.y, this.sprite.width * scale.x, this.sprite.height * scale.y);
+					rect.x, rect.y, rect.width, rect.height);
 		}
 		if (this.gameobject.collider != null){
 			var bound = this.gameobject.collider.getCurBound();
@@ -127,7 +126,12 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 	RenderService.prototype.onLateUpdate = function() {
 		// sort
 		this.rendererArr.sort(function(l, r) {
-			return l.gameobject.transform.getPosition().y - r.gameobject.transform.getPosition().y
+			if (l.gameobject.transform.getDepth() == r.gameobject.transform.getDepth()){
+				return l.gameobject.transform.getPosition().y - r.gameobject.transform.getPosition().y
+			}
+			else{
+				return l.gameobject.transform.getDepth() - r.gameobject.transform.getDepth();
+			}
 		})
 		// render
 		if (this.canvas == null){
