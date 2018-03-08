@@ -24,8 +24,8 @@ define(function (){
 	}
 	
 	function Entity(typeName, name){
-		this.typeName = typeName | "entity";
-		this.name = name | this.typeName;
+		this.typeName = typeName == null ? "entity" : typeName;
+		this.name = name == null ? this.typeName : name;
 		this.active = true;
 		this.dead = false;
 	};
@@ -156,7 +156,7 @@ define(function (){
 	}
 	
 	function Component(typeName){
-		this.typeName = typeName | "Component";
+		this.typeName = typeName == null ? "Component" : typeName;
 		this.active = true;
 		this.dead = false;
 		this.gameobject = null;
