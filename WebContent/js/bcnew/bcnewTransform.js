@@ -17,6 +17,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		this.lossyScale = new bcnewEntity.Vector2(1, 1);
 		this.localScale = new bcnewEntity.Vector2(1, 1);
 		this.parent = null;
+		this.posChanged = false;
 		this.child = new Array();
 		this.rect = new bcnewEntity.Rect(0, 0, 1, 1);
 	}
@@ -62,7 +63,11 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	
 	Transform.prototype.setDepth = function(depth) {
 		this.depth = depth;
-		this.localDepth = this.depth - this.parent.depth;
+		this.localDepth = depth;
+		if (this.parent != null){
+			this.localDepth -= this.parent.getDepth();
+		}
+		this.freshChildDepth();
 	}
 	
 	Transform.prototype.getDepth = function() {
@@ -71,7 +76,11 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	
 	Transform.prototype.setLocalDepth = function(depth) {
 		this.localDepth = depth;
-		this.depth = this.localDepth + this.parent.depth;
+		this.depth = depth;
+		if (this.parent != null){
+			this.depth += this.parent.getDepth();
+		}
+		this.freshChildDepth();
 	}
 	
 	Transform.prototype.getLocalDepth = function() {
@@ -81,31 +90,52 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	Transform.prototype.setPosition = function(position) {
 		this.position.x = position.x;
 		this.position.y = position.y;
-		this.localPosition.x = position.x - this.parent.position.x;
-		this.localPosition.y = position.y - this.parent.position.y;
+		this.localPosition.x = position.x;
+		this.localPosition.y = position.y;
+		if (this.parent != null){
+			var rootPos = this.parent.getPosition();
+			this.localPosition.x -= rootPos.x;
+			this.localPosition.y -= rootPos.y;
+		}
+		this.freshChildPos();
 	}
 	
-	Transform.prototype.getPosition = function() {
+	Transform.prototype.getPosition = function(forceUpdate) {
 		return this.position;
 	}
 	
 	Transform.prototype.setLocalPosition = function(position) {
-		this.localPosition = position;
-		this.position.x = position.x + this.parent.position.x;
-		this.position.y = position.y + this.parent.position.y;
+		this.position.x = position.x;
+		this.position.y = position.y;
+		this.localPosition.x = position.x;
+		this.localPosition.y = position.y;
+		if (this.parent != null){
+			var rootPos = this.parent.getPosition();
+			this.position.x += rootPos.x;
+			this.position.y += rootPos.y;
+		}
+		this.freshChildPos();
 	}
 	
 	Transform.prototype.getLocalPosition = function() {
 		return this.localPosition;
 	}
+	
 	Transform.prototype.getLossyScale = function() {
 		return this.lossyScale;
 	}
 	
 	Transform.prototype.setLocalScale = function(scale) {
-		this.localScale = scale;
-		this.lossyScale.x = scale.x * this.parent.lossyScale.x;
-		this.lossyScale.y = scale.y * this.parent.lossyScale.y;
+		this.lossyScale.x = scale.x;
+		this.lossyScale.y = scale.y;
+		this.localScale.x = scale.x;
+		this.localScale.y = scale.y;
+		if (this.parent != null){
+			var rootScale = this.parent.getLossyScale();
+			this.lossyScale.x *= rootScale.x;
+			this.lossyScale.y *= rootScale.y;
+		}
+		freshChildScale();
 	}
 	
 	Transform.prototype.getLocalScale = function() {
@@ -122,8 +152,14 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		if (this.parent != null){
 			var index = this.parent.child.indexOf(this);
 			if (index >= 0){
-				this.parent.child.splice(index, 1);
+				this.parent.child.splice(index, 1);				
 			}
+			this.parent = null;
+			this.localPosition.x = this.position.x;
+			this.localPosition.y = this.position.y;
+			this.localScale.x = this.lossyScale.x;
+			this.localScale.y = this.lossyScale.y;
+			this.localDepth = this.depth;
 		}
 		if (parent == null){
 			this.parent = bcnGameObjectMng.transform;
@@ -132,20 +168,17 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			this.parent = parent;
 		}
 		this.parent.child.push(this);
-		this.forceUpdate();
+		var rootPos = this.parent.getPosition();
+		this.localPosition.x -= rootPos.x;
+		this.localPosition.y -= rootPos.y;
+		var rootScale = this.parent.getLossyScale();
+		this.localScale.x /= rootScale.x;
+		this.localScale.y /= rootScale.y;
+		this.localDepth -= this.parent.getDepth();
+		
+		this.freshChild();
 	}
-	
-	Transform.prototype.forceUpdate = function() {
-		this.depth = this.localDepth + this.parent.depth;
-		this.position.x = this.localPosition.x + this.parent.position.x;
-		this.position.y = this.localPosition.y + this.parent.position.y;
-		this.lossyScale.x = this.localScale.x * this.parent.lossyScale.x;
-		this.lossyScale.y = this.localScale.y * this.parent.lossyScale.y;
-		for (var idx = 0; idx < this.child.length; ++idx){
-			this.child[idx].forceUpdate();
-		}
-	}
-	
+		
 	Transform.prototype.findChild = function(name) {
 		for (var idx = 0; idx < this.child.length; ++idx){
 			console.log(this.child[idx].gameobject.name);
@@ -156,12 +189,36 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		return null;
 	}
 	
-	Transform.prototype.update = function() {
-		
+	Transform.prototype.freshChild = function() {
+		for (var idx = 0; idx < this.child.length; ++idx){
+			console.log(this.child[idx].gameobject.name);
+			this.child[idx].setLocalPosition(this.child[idx].localPosition);
+			this.child[idx].setLocalScale(this.child[idx].localScale);
+			this.child[idx].setLocalDepth(this.child[idx].localDepth);
+			console.log(this.child[idx]);
+			this.child[idx].freshChild();
+		}
 	}
 	
-	Transform.prototype.lateUpdate = function() {
-		
+	Transform.prototype.freshChildPos = function(){
+		for (var idx = 0; idx < this.child.length; ++idx){
+			this.child[idx].setLocalPosition(this.child[idx].localPosition);
+			this.child[idx].freshChildPos();
+		}
+	}
+	
+	Transform.prototype.freshChildScale = function() {
+		for (var idx = 0; idx < this.child.length; ++idx){
+			this.child[idx].setLocalScale(this.child[idx].localScale);
+			this.child[idx].freshChildScale();
+		}
+	}
+	
+	Transform.prototype.freshChildDepth = function() {
+		for (var idx = 0; idx < this.child.length; ++idx){
+			this.child[idx].setLocalDepth(this.child[idx].localDepth);
+			this.child[idx].freshChildDepth();
+		}
 	}
 	
 	return {
