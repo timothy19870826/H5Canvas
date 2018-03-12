@@ -2,13 +2,39 @@
  * 
  */
 
-define(["bcnew/bcnewEntity", "bcnew/bcnewCollider", "bcnew/bcnewGameObject", "bcnew/bcnewResource", "bcnew/bcnewRender", "bcnew/bcnewInput"], 
+define(
+		["bcnew/bcnewEntity", 
+		"bcnew/bcnewCollider", 
+		"bcnew/bcnewGameObject", 
+		"bcnew/bcnewResource", 
+		"bcnew/bcnewRender", 
+		"bcnew/bcnewInput"], 
 function (bcnewEntity, bcnewCollider, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
 	
+	function Timer(){
+		var date = new Date();
+		this.curTime = date.getTime();
+	}
+	
+	Timer.prototype.update = function() {
+		var date = new Date();
+		this.frameTime = date.getTime() - this.curTime;
+		this.curTime = date.getTime();
+	}
+	
+	Timer.prototype.getCurTime = function() {
+		return this.curTime;
+	}
+	
+	Timer.prototype.getFrameTime = function() {
+		return this.frameTime;
+	}
+			
 	function Client(){
 		this.canvas = null;
 		this.mainLoopId = null;
 		this.scale = 1;
+		window.bcnTimer = new Timer();
 		window.bcnServiceCenter = new bcnewEntity.ServiceCenter();
 		bcnServiceCenter.regService(new bcnewInput.Input());
 		bcnServiceCenter.regService(new bcnewRender.RenderService());
@@ -86,6 +112,7 @@ function (bcnewEntity, bcnewCollider, bcnewGameObject, bcnewResource, bcnewRende
 	}	
 	
 	Client.prototype.update = function (){
+		bcnTimer.update();
 		bcnServiceCenter.update();
 		bcnServiceCenter.lateUpdate();
 		bcnInput.resetState();

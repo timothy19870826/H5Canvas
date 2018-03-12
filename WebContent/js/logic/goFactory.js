@@ -29,7 +29,7 @@ function(bcnew) {
 			var renderer = new bcnewRender.Renderer();
 			renderer.setSprite(sprite);
 			go.addComp(renderer);
-			go.render = renderer;
+			go.renderer = renderer;
 		}
 		for (var idx = 0; idx < config.child.length; ++idx){
 			var childGo = createGO(config.child[idx], go);

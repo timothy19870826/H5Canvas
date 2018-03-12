@@ -21,7 +21,7 @@ function (bcnew, logics){
 		var renderer = new bcnewRender.Renderer();
 		renderer.setSprite(sprite);
 		this.dog.addComp(renderer);
-		this.dog.render = renderer;
+		this.dog.renderer = renderer;
 		var collider = new bcnewCollider.Collider();
 		collider.autoCollider = true;
 		collider.onTouchEnd = function() {
