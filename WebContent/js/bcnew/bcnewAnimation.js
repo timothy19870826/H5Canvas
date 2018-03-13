@@ -3,9 +3,12 @@
  */
 define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	
-	function Action(gameobject){
-		this.gameobject = gameobject;
+	function Action(){
+		this.gameobject = null;
 		this.next = null;
+		this.onCompleted = null;
+		this.onCompletedArg = null;
+		this.child = new Array();
 	}
 	
 	Action.prototype.isCompleted = function() {
@@ -13,10 +16,46 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	}
 	
 	Action.prototype.init = function() {
+		this.onInit();
+		for (var idx = 0; idx < this.child.length; ++idx){
+			this.child[idx].gameobject = this.gameobject;
+			this.child[idx].init();
+		}
+	}
+	
+	Action.prototype.onInit = function() {
+		
+	}
+	
+	Action.prototype.reset = function() {
+		this.onReset();
+		for (var idx = 0; idx < this.child.length; ++idx){
+			this.child[idx].reset();
+		}
+	}
+	
+	Action.prototype.onReset = function() {
 		
 	}
 	
 	Action.prototype.update = function() {
+		this.onUpdate();
+		for (var idx = this.child.length - 1; idx >= 0; --idx){
+			this.child[idx].update();
+			if (this.child[idx].isCompleted()){
+				if (this.child[idx].getNext() == null){
+					this.child.splice(idx, 1);
+				}
+				else{
+					this.child[idx] = this.child[idx].getNext();
+					this.child[idx].gameobject = this.gameobject;
+					this.child[idx].init();
+				}
+			}
+		}
+	}
+	
+	Action.prototype.onUpdate = function() {
 		
 	}
 	
@@ -28,51 +67,70 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		return this.next;
 	}
 	
-	function FrameAnimCfg(sprite, keyTime){
+	Action.prototype.addChild = function(action) {
+		this.child.push(action);
+	}
+	
+	function FrameCfg(sprite, keyTime){
 		this.sprite = sprite;
 		this.keyTime = keyTime;
 	}
 	
-	function FrameAnimAction(gameobject, framAnimArr, lifeTime){
-		Action.call(this, gameobject);
-		this.framAnimArr = framAnimArr;
-		this.framAnimArr.sort(function(l, r) {
+	function FrameAnimCfg(duration, frameArr){
+		this.duration = duration;
+		this.frameArr = frameArr;
+	}
+	
+	function FrameAnimAction(frameAnimCfg){
+		Action.call(this);
+		this.frameArr = frameAnimCfg.frameArr;
+		this.frameArr.sort(function(l, r) {
 			return l.keyTime - r.keyTime;
 		});
 		this.curTime = 0;
 		this.frameTime = 0;
 		this.frameIdx = 0;
-		this.isLoop = lifeTime == null ? true : false;
-		this.lifeTime = lifeTime == null ? 0 : lifeTime;
+		this.isLoop = frameAnimCfg.duration == null ? true : false;
+		this.duration = frameAnimCfg.duration == null ? 0 : frameAnimCfg.duration;
+		this.leftTime = this.duration;
 	}
 	
 	FrameAnimAction.prototype = new Action();
 	
-	FrameAnimAction.prototype.init = function() {
+	FrameAnimAction.prototype.onInit = function() {
 		this.curTime = bcnTimer.getCurTime();
 	}
 	
-	FrameAnimAction.prototype.isCompleted = function() {
-		return this.isLoop == false && this.lifeTime <= 0;
+	FrameAnimAction.prototype.onReset = function() {
+		this.leftTime = this.duration;
+		this.frameTime = 0;
+		this.frameIdx = 0;
 	}
 	
-	FrameAnimAction.prototype.update = function() {
-		this.frameTime += bcnTimer.getFrameTime();
-		if (this.isLoop == false){
-			this.lifeTime -= bcnTimer.getFrameTime();
-			if (this.lifeTime <= 0){
-				return ;
-			}
+	FrameAnimAction.prototype.isCompleted = function() {
+		return this.isLoop == false && this.leftTime <= 0;
+	}
+	
+	FrameAnimAction.prototype.onUpdate = function() {
+		if (this.isCompleted()){
+			return;
 		}
-		if (this.frameTime > this.framAnimArr[this.frameIdx].keyTime){
-			if (this.frameIdx + 1 == this.framAnimArr.length){
-				this.frameTime -= this.framAnimArr[this.frameIdx].keyTime;
+		this.frameTime += bcnTimer.getFrameTime();
+		if (this.frameTime > this.frameArr[this.frameIdx].keyTime){
+			if (this.frameIdx + 1 == this.frameArr.length){
+				this.frameTime -= this.frameArr[this.frameIdx].keyTime;
 				this.frameIdx = 0;
 				this.freshSprite();
 			}
-			else if (this.frameTime > this.framAnimArr[this.frameIdx + 1].keyTime){
+			else if (this.frameTime > this.frameArr[this.frameIdx + 1].keyTime){
 				this.frameIdx++;
 				this.freshSprite();
+			}
+		}
+		if (this.isLoop == false){
+			this.leftTime -= bcnTimer.getFrameTime();
+			if (this.leftTime <= 0 && this.onCompleted != null){
+				this.onCompleted(this.onCompletedArg);
 			}
 		}
 	}
@@ -80,7 +138,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	FrameAnimAction.prototype.freshSprite = function() {
 		if (this.gameobject != null && 
 			this.gameobject.renderer != null){
-			this.gameobject.renderer.setSprite(this.framAnimArr[this.frameIdx].sprite);
+			this.gameobject.renderer.setSprite(this.frameArr[this.frameIdx].sprite);
 		}
 	}
 	
@@ -90,67 +148,121 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		this.isLocal = isLocal;
 	}
 	
-	function MoveAction(gameobject, moveCfg){
-		Action.call(this, gameobject);
+	function MoveAction(moveCfg){
+		Action.call(this);
 		this.moveCfg = moveCfg;
-		this.completed = false;
-		this.curDest = null;
+		this.curIdx = 0;
+		this.lastPos = new bcnewEntity.Vector2(0, 0);
+		this.totalTime = 0;
+		this.passedTime = 0;
 	}
 	
 	MoveAction.prototype = new Action();
 	
-	MoveAction.prototype.update = function() {
-		if (this.curDest == null){
-			this.curDest = this.moveCfg.track.shift();
-		}
-		var leftTime = this.move(this.gameobject.transform, 
-				this.curDest, 
-				this.moveCfg.speed, 
-				bcnTimer.getFrameTime(),
-				this.moveCfg.isLocal);
-		if (leftTime > 0){
-			if (this.moveCfg.track.length == 0){
-				this.completed = true;
-				return;
-			}
-			this.curDest = this.moveCfg.track.shift();
-			this.move(this.gameobject.transform, 
-					this.curDest, 
-					this.moveCfg.speed, 
-					leftTime,
-					this.moveCfg.isLocal);
-		}
+	MoveAction.prototype.isCompleted = function() {
+		return this.curIdx >= this.moveCfg.track.length;
 	}
 	
-	MoveAction.prototype.move = function(trans, tarPos, spd, time, isLocal) {
-		throw "empty";
-		return 0;
+	MoveAction.prototype.onReset = function() {
+		this.curIdx = 0;
 	}
+	
+	MoveAction.prototype.onInit = function() {
+		this.curIdx = 0;
+		var pos = this.moveCfg.isLocal ? this.gameobject.transform.getLocalPosition() : this.gameobject.transform.getPosition();
+		this.lastPos.x = pos.x;
+		this.lastPos.y = pos.y;
+		this.totalTime = costTime(
+				this.lastPos,
+				this.moveCfg.track[this.curIdx], 
+				this.moveCfg.speed);
+		this.passedTime = 0;
+	}
+	
+	MoveAction.prototype.onUpdate = function() {
+		if (this.isCompleted()){
+			return;
+		}
+		this.passedTime += bcnTimer.getFrameTime();
+		if (this.passedTime > this.totalTime){
+			if (this.moveCfg.isLocal){
+				this.gameobject.transform.setLocalPosition(this.moveCfg.track[this.curIdx]);
+			}
+			else{
+				this.gameobject.transform.setPosition(this.moveCfg.track[this.curIdx]);
+			}
+			this.curIdx++;
+			if (this.isCompleted()){
+				return;
+			}
+			this.passedTime -= this.totalTime;
+			var pos = this.moveCfg.isLocal ? this.gameobject.transform.getLocalPosition() : this.gameobject.transform.getPosition();
+			this.lastPos.x = pos.x;
+			this.lastPos.y = pos.y;
+			this.totalTime = costTime(
+					this.lastPos,
+					this.moveCfg.track[this.curIdx], 
+					this.moveCfg.speed);
+		}
+
+		if (this.moveCfg.isLocal){
+			this.gameobject.transform.setLocalPosition(
+					Lerp(this.lastPos,
+						this.moveCfg.track[this.curIdx],
+						this.passedTime / this.totalTime));
+		}
+		else{
+			this.gameobject.transform.setPosition(
+					Lerp(this.lastPos,
+						this.moveCfg.track[this.curIdx],
+						this.passedTime / this.totalTime));
+		}
+		
+	}
+	
+	function Lerp(srcPos, dstPos, percent){
+		console.log(percent);
+		var pos = new bcnewEntity.Vector2(srcPos.x, srcPos.y);
+		pos.x += (dstPos.x - srcPos.x) * percent;
+		pos.y += (dstPos.y - srcPos.y) * percent;
+		return pos;
+	}
+	
+	function costTime(srcPos, dstPos, speed){
+		var length = Math.pow(dstPos.x - srcPos.x, 2) + Math.pow(dstPos.y - srcPos.y, 2);
+		length = Math.sqrt(length);
+		return length / speed * 1000;
+	}
+	
 	
 	function BlinkCfg(dest, isLocal) {
 		this.dest = dest;
 		this.isLocal = isLocal;
 	}
 	
-	function BlinkAction(gameobject, blinkCfg){
-		Action.call(this, gameobject);
+	function BlinkAction(blinkCfg){
+		Action.call(this);
 		this.blinkCfg = blinkCfg;
 		this.completed = false;
 	}
 	
 	BlinkAction.prototype = new Action();
 	
-	FrameAnimAction.prototype.isCompleted = function() {
+	BlinkAction.prototype.isCompleted = function() {
 		return this.completed;
 	}
 	
-	BlinkAction.prototype.update = function() {
-		if (this.completed == false){
-			this.completed = true;
-			if (this.gameobject == null ||
-				this.gameobject.transform == null){
-				return;
-			}
+	BlinkAction.prototype.onReset = function() {
+		this.completed = false;
+	}
+	
+	BlinkAction.prototype.onUpdate = function() {
+		if (this.completed){
+			return;
+		}
+
+		if (this.gameobject != null &&
+			this.gameobject.transform != null){
 			if (this.blinkCfg.isLocal){
 				this.gameobject.transform.setLocalPosition(this.blinkCfg.dest);
 			}
@@ -158,17 +270,24 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 				this.gameobject.transform.setPosition(this.blinkCfg.dest);
 			}
 		}
+		
+		this.completed = true;
+		if (this.onCompleted != null){
+			this.onCompleted(this.onCompletedArg);
+		}
 	}
 	
 	function Animation(){
 		bcnewEntity.Component.call(this, "Animation", "Animation");
 		this.actions = new Array();
-		this.curentAction = null;
+		this.currentAction = null;
 	}
 	
 	Animation.prototype = new bcnewEntity.Component();
 	
 	Animation.prototype.addAction = function (action){
+		action.gameobject = this.gameobject;
+		action.init();
 		this.actions.push(action);
 	}
 	
@@ -188,23 +307,35 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	Animation.prototype.getAction = function(idx) {
 		if (idx < 0 || idx >= this.actions.length){
 			return null;
-		}
+		}		
 		return this.actions[idx];
 	}
 	
 	Animation.prototype.update = function() {
-		this.onMainUpdate();
 		for (var idx = this.actions.length - 1; idx >= 0; --idx){
 			this.actions[idx].update();
-			if (this.actions[idx].completed){
-				if (this.actions[idx].next != null){
-					this.actions[idx] = this.actions[idx].next;
+			if (this.actions[idx].isCompleted()){
+				if (this.actions[idx].getNext() == null){
+					this.actions.splice(idx, 1);
 				}
 				else{
-					this.actions.splice(idx, 1);
+					this.actions[idx] = this.actions[idx].getNext();
+					this.actions[idx].gameobject = this.gameobject;
+					this.actions[idx].init();
 				}
 			}
 		}
 	}
 	
+	return {
+		Animation : Animation,
+		Action : Action,
+		FrameAnimAction : FrameAnimAction,
+		FrameAnimCfg : FrameAnimCfg,
+		FrameCfg : FrameCfg,
+		MoveAction : MoveAction,
+		MoveCfg : MoveCfg,
+		BlinkAction : BlinkAction,
+		BlinkCfg : BlinkCfg,
+	}
 })

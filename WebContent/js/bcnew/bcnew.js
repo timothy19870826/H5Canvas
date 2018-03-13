@@ -10,6 +10,7 @@ define(
 			"bcnew/bcnewGameObject", 
 			"bcnew/bcnewResource", 
 			"bcnew/bcnewRender", 
+			"bcnew/bcnewAnimation",
 			"bcnew/bcnewInput",
 			"bcnew/bcnewClient"
 		],
@@ -19,6 +20,7 @@ define(
 				bcnewGameObject,
 				bcnewResource,
 				bcnewRender,
+				bcnewAnimation,
 				bcnewInput,
 				bcnewClient){
 			window.bcnewEntity = bcnewEntity;
@@ -27,6 +29,7 @@ define(
 			window.bcnewGameObject = bcnewGameObject;
 			window.bcnewResource = bcnewResource;
 			window.bcnewRender = bcnewRender;
+			window.bcnewAnimation = bcnewAnimation;
 			window.bcnewInput = bcnewInput;
 			window.bcnewClient = bcnewClient;
 		}

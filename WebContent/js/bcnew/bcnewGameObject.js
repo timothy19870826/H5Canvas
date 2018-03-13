@@ -56,8 +56,7 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 				continue;
 			}
 			else if (this.compArr[idx].active && 
-					this.compArr[idx].dead == false &&
-					this.compArr[idx].update != null){
+					this.compArr[idx].dead == false){
 				this.compArr[idx].update();
 			}
 		}
@@ -80,8 +79,7 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 				continue;
 			}
 			else if (this.compArr[idx].active && 
-					this.compArr[idx].dead == false &&
-					this.compArr[idx].lateUpdate != null){
+					this.compArr[idx].dead == false){
 				this.compArr[idx].lateUpdate();
 			}
 		}

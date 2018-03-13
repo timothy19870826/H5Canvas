@@ -160,8 +160,6 @@ define(function (){
 		this.active = true;
 		this.dead = false;
 		this.gameobject = null;
-		this.update = null;
-		this.lateUpdate = null;
 	}
 	
 	Component.prototype.getTypeName = function(){
@@ -174,6 +172,12 @@ define(function (){
 	
 	Component.prototype.destroy = function(){
 		console.log("destroy");
+	};
+
+	Component.prototype.update = function(){
+	};
+	
+	Component.prototype.lateUpdate = function(){
 	};
 	
 	return {

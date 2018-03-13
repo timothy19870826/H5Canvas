@@ -178,6 +178,17 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		
 		this.freshChild();
 	}
+	
+	Transform.prototype.getChildCount = function() {
+		return this.child.length;
+	}
+	
+	Transform.prototype.getChildByIdx = function(idx) {
+		if (idx < 0 || idx >= this.child.length){
+			return null;
+		}
+		return this.child[idx];
+	}
 		
 	Transform.prototype.findChild = function(name) {
 		for (var idx = 0; idx < this.child.length; ++idx){
