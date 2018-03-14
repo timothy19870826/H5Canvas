@@ -1,7 +1,7 @@
 /**
  * 
  */
-define(["bcnew/bcnewEntity"], function(bcnewEntity) {
+define(["bcnew/bcnewEntity", "bcnew/bcnewEventCenter"], function(bcnewEntity, bcnewEventCenter) {
 	
 	function Collider(){
 		bcnewEntity.Component.call(this, "Collider");
@@ -12,9 +12,9 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		this.autoCollider = false;
 		this.trigger = true;
 		this.lastTime = 0;
-		this.onTouchStart = null;
-		this.onTouchEnd = null;
-		this.onClick = null;
+		this.onTouchStart = new bcnewEventCenter.EvtListenerGroup(0);
+		this.onTouchEnd = new bcnewEventCenter.EvtListenerGroup(0);
+		this.onClick = new bcnewEventCenter.EvtListenerGroup(0);
 	}
 	
 	Collider.prototype = new bcnewEntity.Component();
@@ -103,13 +103,8 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			if (collider == null){
 				return;
 			}
-			if (collider.onTouchStart != null){
-				collider.onTouchStart(touchPos);
-			}
-			if (collider.onClick != null){
-				var date = new Date();
-				collider.lastTime = date.getTime();
-			}
+			collider.onTouchStart.dispacthMessage(touchPos);
+			collider.lastTime = bcnTimer.getTimeSinceLoad();
 		}
 		if (bcnInput.isMouseUp()){
 			var touchPos = bcnewClient.inputPos2Game(bcnInput.getMousePos());
@@ -118,14 +113,9 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			if (collider == null){
 				return;
 			}
-			if (collider.onTouchEnd != null){
-				collider.onTouchEnd(touchPos);
-			}
-			if (collider.onClick != null){
-				var date = new Date();
-				if (date.getTime() - collider.lastTime < 1000){
-					collider.onClick(touchPos);
-				}
+			collider.onTouchEnd.dispacthMessage(touchPos);
+			if (bcnTimer.getTimeSinceLoad() - collider.lastTime < 1000){
+				collider.onClick.dispacthMessage(touchPos);
 			}
 		}
 	}

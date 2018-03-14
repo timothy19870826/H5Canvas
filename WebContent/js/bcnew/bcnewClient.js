@@ -2,41 +2,16 @@
  * 
  */
 
-define(
-		["bcnew/bcnewEntity", 
-		"bcnew/bcnewCollider", 
-		"bcnew/bcnewGameObject", 
-		"bcnew/bcnewResource", 
-		"bcnew/bcnewRender", 
-		"bcnew/bcnewInput"], 
-function (bcnewEntity, bcnewCollider, bcnewGameObject, bcnewResource, bcnewRender, bcnewInput){
-	
-	function Timer(){
-		var date = new Date();
-		this.curTime = date.getTime();
-	}
-	
-	Timer.prototype.update = function() {
-		var date = new Date();
-		this.frameTime = date.getTime() - this.curTime;
-		this.curTime = date.getTime();
-	}
-	
-	Timer.prototype.getCurTime = function() {
-		return this.curTime;
-	}
-	
-	Timer.prototype.getFrameTime = function() {
-		return this.frameTime;
-	}
+define(["bcnew/bcnew"], function (bcnew){
 			
 	function Client(){
 		this.canvas = null;
 		this.mainLoopId = null;
 		this.scale = 1;
-		window.bcnTimer = new Timer();
 		window.bcnServiceCenter = new bcnewEntity.ServiceCenter();
+		bcnServiceCenter.regService(new bcnewTimer.Timer());
 		bcnServiceCenter.regService(new bcnewInput.Input());
+		bcnServiceCenter.regService(new bcnewEventCenter.EventCenter());
 		bcnServiceCenter.regService(new bcnewRender.RenderService());
 		bcnServiceCenter.regService(new bcnewGameObject.GameObjectMng());
 		bcnServiceCenter.regService(new bcnewResource.ResourceMng());
@@ -112,7 +87,6 @@ function (bcnewEntity, bcnewCollider, bcnewGameObject, bcnewResource, bcnewRende
 	}	
 	
 	Client.prototype.update = function (){
-		bcnTimer.update();
 		bcnServiceCenter.update();
 		bcnServiceCenter.lateUpdate();
 		bcnInput.resetState();
@@ -136,11 +110,13 @@ function (bcnewEntity, bcnewCollider, bcnewGameObject, bcnewResource, bcnewRende
 	function inputPos2Game(pos){
 		return new bcnewEntity.Vector2(pos.x / bcnClient.scale, pos.y / bcnClient.scale);
 	}	
+
+	window.bcnewClient = {
+			init : init,
+			startMainLoop : startMainLoop,
+			stopMainLoop : stopMainLoop,
+			inputPos2Game : inputPos2Game
+		}
 	
-	return {
-		init : init,
-		startMainLoop : startMainLoop,
-		stopMainLoop : stopMainLoop,
-		inputPos2Game : inputPos2Game
-	}
+	return window.bcnewClient;
 });

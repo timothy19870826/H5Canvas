@@ -1,13 +1,12 @@
 /**
  * 
  */
-define(["bcnew/bcnewEntity"], function(bcnewEntity) {
+define(["bcnew/bcnewEntity", "bcnew/bcnewEventCenter"], function(bcnewEntity, bcnewEventCenter) {
 	
 	function Action(){
 		this.gameobject = null;
 		this.next = null;
-		this.onCompleted = null;
-		this.onCompletedArg = null;
+		this.onCompleted = new bcnewEventCenter.EvtListenerGroup(0);
 		this.child = new Array();
 	}
 	
@@ -98,7 +97,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	FrameAnimAction.prototype = new Action();
 	
 	FrameAnimAction.prototype.onInit = function() {
-		this.curTime = bcnTimer.getCurTime();
+		this.curTime = bcnTimer.getTimeSinceLoad();
 	}
 	
 	FrameAnimAction.prototype.onReset = function() {
@@ -115,7 +114,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		if (this.isCompleted()){
 			return;
 		}
-		this.frameTime += bcnTimer.getFrameTime();
+		this.frameTime += bcnTimer.getDeltaTime();
 		if (this.frameTime > this.frameArr[this.frameIdx].keyTime){
 			if (this.frameIdx + 1 == this.frameArr.length){
 				this.frameTime -= this.frameArr[this.frameIdx].keyTime;
@@ -128,9 +127,9 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			}
 		}
 		if (this.isLoop == false){
-			this.leftTime -= bcnTimer.getFrameTime();
-			if (this.leftTime <= 0 && this.onCompleted != null){
-				this.onCompleted(this.onCompletedArg);
+			this.leftTime -= bcnTimer.getDeltaTime();
+			if (this.leftTime <= 0){
+				this.onCompleted.dispacthMessage(this);
 			}
 		}
 	}
@@ -183,7 +182,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		if (this.isCompleted()){
 			return;
 		}
-		this.passedTime += bcnTimer.getFrameTime();
+		this.passedTime += bcnTimer.getDeltaTime();
 		if (this.passedTime > this.totalTime){
 			if (this.moveCfg.isLocal){
 				this.gameobject.transform.setLocalPosition(this.moveCfg.track[this.curIdx]);
@@ -193,6 +192,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			}
 			this.curIdx++;
 			if (this.isCompleted()){
+				this.onCompleted.dispacthMessage(this);
 				return;
 			}
 			this.passedTime -= this.totalTime;
@@ -221,7 +221,6 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	}
 	
 	function Lerp(srcPos, dstPos, percent){
-		console.log(percent);
 		var pos = new bcnewEntity.Vector2(srcPos.x, srcPos.y);
 		pos.x += (dstPos.x - srcPos.x) * percent;
 		pos.y += (dstPos.y - srcPos.y) * percent;
@@ -272,9 +271,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 		}
 		
 		this.completed = true;
-		if (this.onCompleted != null){
-			this.onCompleted(this.onCompletedArg);
-		}
+		this.onCompleted.dispacthMessage(this);
 	}
 	
 	function Animation(){

@@ -49,9 +49,7 @@ function (bcnew, logics){
 				var pos;
 				var size = wldGameLogic.smallDog.getSize();
 				for (var idx = 1; idx <= step; ++idx){
-					console.log((startIdx + idx) % this.getChildCount());
 					child = this.getChildByIdx((startIdx + idx) % this.getChildCount());
-					console.log(child);
 					pos = child.getPosition();
 					if (child != null){
 						track.push(new bcnewEntity.Vector2(pos.x, pos.y - size.y / 2));
@@ -74,52 +72,54 @@ function (bcnew, logics){
 			// collider
 			var collider = new bcnewCollider.Collider();
 			collider.autoCollider = true;
-			collider.onTouchEnd = function() {
-				if (this.disable == true){
-					return;
-				}
-				wldGameLogic.count = getRandomInt(1, 7);
-				console.log(wldGameLogic.count);
-				var frameAnimCfg = logicGoFactory.createFrameAnimCfg(logicMainConfig.diceAnim, logicMainConfig.spriteCfg);
-				frameAnimCfg.duration = 2000;
-				var action = new bcnewAnimation.FrameAnimAction(frameAnimCfg);
-				frameAnimCfg = logicGoFactory.createFrameAnimCfg(getDiceState(wldGameLogic.count), logicMainConfig.spriteCfg);
-				frameAnimCfg.duration = 1;
-				var nextAction = new bcnewAnimation.FrameAnimAction(frameAnimCfg);
-				nextAction.onCompletedArg = wldGameLogic.smallDog;
-				nextAction.onCompleted = function(args){
-					console.log(logicMainConfig.dogAnim);
-					var dogAnimCfg = logicGoFactory.createFrameAnimCfg(logicMainConfig.dogAnim, logicMainConfig.spriteCfg);
-					var dogAnim = new bcnewAnimation.FrameAnimAction(dogAnimCfg);
-					var moveCfg = new bcnewAnimation.MoveCfg(new Array(), 100, false);
-					moveCfg.track = wldGameLogic.path.getTrack(wldGameLogic.curIdx, wldGameLogic.count);
-					wldGameLogic.curIdx += wldGameLogic.count;
-					console.log(moveCfg.track);
-					var moveAction = new bcnewAnimation.MoveAction(moveCfg);
-					moveAction.addChild(dogAnim);
-					args.gameobject.animation.addAction(moveAction);
-					//args.transform.position.x = args.transform.position.x + 100;
-					this.onCompleted = null;
-				}
-				action.setNext(nextAction);
-				this.gameobject.animation.addAction(action);
-				this.disable = true;
-				this.onTimeOut = function(){
-					wldGameLogic.dice.gameobject.collider.disable = false;
-				}
-				setTimeout(this.onTimeOut, 2000);
-			}
 			this.dice.gameobject.addComp(collider);
 			this.dice.gameobject.collider = collider;
+			collider.onTouchEnd.addListener(onClickDice, this.dice.gameobject);
 		}
 	}
 	
 	GameLogic.prototype.onUpdate = function() {
 	}
 	
+	function onClickDice(dice, touchPos){
+		if (dice.collider.disable == true){
+			console.log("disable, click");
+			return;
+		}
+		wldGameLogic.count = getRandomInt(1, 7);
+		var frameAnimCfg = logicGoFactory.createFrameAnimCfg(logicMainConfig.diceAnim, logicMainConfig.spriteCfg);
+		frameAnimCfg.duration = 2000;
+		var action = new bcnewAnimation.FrameAnimAction(frameAnimCfg);
+		frameAnimCfg = logicGoFactory.createFrameAnimCfg(getDiceState(wldGameLogic.count), logicMainConfig.spriteCfg);
+		frameAnimCfg.duration = 1;
+		var nextAction = new bcnewAnimation.FrameAnimAction(frameAnimCfg);
+		nextAction.onCompleted.addListener(onDiceAnimCompleted, wldGameLogic.smallDog);
+		action.setNext(nextAction);
+		dice.animation.addAction(action);
+		dice.collider.disable = true;
+		
+		bcnTimer.addTimer(function(arg) {
+			arg.collider.disable = false;
+			console.log("lalalal, hahahaha");
+		},
+		dice, 2000, 1);
+	}
+	
+	function onDiceAnimCompleted(dog, sender){
+		var dogAnimCfg = logicGoFactory.createFrameAnimCfg(logicMainConfig.dogAnim, logicMainConfig.spriteCfg);
+		var dogAnim = new bcnewAnimation.FrameAnimAction(dogAnimCfg);
+		var moveCfg = new bcnewAnimation.MoveCfg(new Array(), 100, false);
+		moveCfg.track = wldGameLogic.path.getTrack(wldGameLogic.curIdx, wldGameLogic.count);
+		wldGameLogic.curIdx += wldGameLogic.count;
+		var moveAction = new bcnewAnimation.MoveAction(moveCfg);
+		moveAction.addChild(dogAnim);
+		dog.gameobject.animation.addAction(moveAction);
+		sender.onCompleted.clear();
+	}
+	
 	function getRandomInt(min, max) {
 		  return min + Math.floor(Math.random() * Math.floor(max));
-		}
+	}
 	
 	function getDiceState(diceCount){
 		switch (diceCount) {

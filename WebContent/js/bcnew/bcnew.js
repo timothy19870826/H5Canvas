@@ -11,8 +11,9 @@ define(
 			"bcnew/bcnewResource", 
 			"bcnew/bcnewRender", 
 			"bcnew/bcnewAnimation",
+			"bcnew/bcnewTimer",
 			"bcnew/bcnewInput",
-			"bcnew/bcnewClient"
+			"bcnew/bcnewEventCenter",
 		],
 		function (bcnewEntity,
 				bcnewTransform,
@@ -21,8 +22,9 @@ define(
 				bcnewResource,
 				bcnewRender,
 				bcnewAnimation,
+				bcnewTimer,
 				bcnewInput,
-				bcnewClient){
+				bcnewEventCenter){
 			window.bcnewEntity = bcnewEntity;
 			window.bcnewTransform = bcnewTransform;
 			window.bcnewCollider = bcnewCollider;
@@ -30,7 +32,8 @@ define(
 			window.bcnewResource = bcnewResource;
 			window.bcnewRender = bcnewRender;
 			window.bcnewAnimation = bcnewAnimation;
+			window.bcnewTimer = bcnewTimer;
 			window.bcnewInput = bcnewInput;
-			window.bcnewClient = bcnewClient;
+			window.bcnewEventCenter = bcnewEventCenter;
 		}
 );
