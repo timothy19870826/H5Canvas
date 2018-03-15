@@ -62,8 +62,8 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewEventCenter"], function(bcnewEntity, bc
 			this.curBound.height = size.y * scale.y;
 			return this.curBound;
 		}
-		this.curBound.x = this.bound.x + position.x;
-		this.curBound.y = this.bound.y + position.y;
+		this.curBound.x = this.bound.x + position.x + this.offset.x;
+		this.curBound.y = this.bound.y + position.y + this.offset.y;
 		this.curBound.width = this.bound.width * scale.x;
 		this.curBound.height = this.bound.height * scale.y;		
 		return this.curBound;
