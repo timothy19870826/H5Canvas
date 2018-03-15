@@ -26,10 +26,8 @@ function(bcnew) {
 		if (config.sprite != null && config.sprite != ""){
 			var imgAsset = bcnResourceMng.loadAsset("Images/" + config.sprite + ".png");
 			var sprite = new bcnewRender.Sprite(imgAsset, 0, 0, 0, 0);
-			var renderer = new bcnewRender.Renderer();
+			var renderer = go.createComp("Renderer");// new bcnewRender.Renderer();
 			renderer.setSprite(sprite);
-			go.addComp(renderer);
-			go.renderer = renderer;
 		}
 		for (var idx = 0; idx < config.child.length; ++idx){
 			var childGo = createGO(config.child[idx], go);

@@ -280,6 +280,10 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewEventCenter"], function(bcnewEntity, bc
 		this.currentAction = null;
 	}
 	
+	bcnewEntity.regComponent("Animation", function (){
+		return new bcnewAnimation.Animation();
+	})
+	
 	Animation.prototype = new bcnewEntity.Component();
 	
 	Animation.prototype.addAction = function (action){

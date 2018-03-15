@@ -14,33 +14,33 @@ function (bcnew, logics){
 	GameLogic.prototype = new bcnewEntity.Entity();
 	
 	GameLogic.prototype.onInit = function() {
+		this.curIdx = 0;
+		
 		this.dog = new bcnewGameObject.GameObject("dog");
 		this.dog.transform.setSize(new bcnewEntity.Vector2(200, 268));
+				
+		var renderer = this.dog.createComp("Renderer");
 		var imgAsset = bcnResourceMng.loadAsset("Images/zy_xyz.png");
 		var sprite = new bcnewRender.Sprite(imgAsset, 0, 0, 0, 0);
-		var renderer = new bcnewRender.Renderer();
 		renderer.setSprite(sprite);
-		this.dog.addComp(renderer);
-		this.dog.renderer = renderer;
-		var collider = new bcnewCollider.Collider();
+		
+		var collider = this.dog.createComp("Collider");
 		collider.autoCollider = true;
-		collider.onTouchEnd = function() {
-			this.gameobject.transform.position.x = this.gameobject.transform.position.x + 100;
-		}
-		this.dog.addComp(collider);
-		this.dog.collider = collider;
-		this.curIdx = 0;
+		collider.onTouchEnd.addListener(function(arg) {
+			arg.transform.position.x = arg.transform.position.x + 100;
+		}, this.dog); 
+				
 		var go = logicGoFactory.createGOByConfig(logicMainConfig.mainLayout);
 		go.name = "main";
+		
 		this.smallDog = go.transform.findChild("dog");
 		if (this.smallDog != null){
-			var animation = new bcnewAnimation.Animation();
-			this.smallDog.gameobject.addComp(animation);
-			this.smallDog.gameobject.animation = animation;
+			this.smallDog.gameobject.createComp("Animation");
 		}
 		else{
 			console.log("smallDog nullllll");
 		}
+		
 		this.path = go.transform.findChild("path");
 		if (this.path != null){
 			this.path.getTrack = function(startIdx, step) {
@@ -61,19 +61,16 @@ function (bcnew, logics){
 		else{
 			console.log("path nullllll");
 		}
+		
 		this.dice = go.transform.findChild("dice");
 		if (this.dice == null){
 			console.log("dice nullllll");
 		}
 		else{
-			var animation = new bcnewAnimation.Animation();
-			this.dice.gameobject.addComp(animation);
-			this.dice.gameobject.animation = animation;
+			var animation = this.dice.gameobject.createComp("Animation");
 			// collider
-			var collider = new bcnewCollider.Collider();
+			var collider = this.dice.gameobject.createComp("Collider");
 			collider.autoCollider = true;
-			this.dice.gameobject.addComp(collider);
-			this.dice.gameobject.collider = collider;
 			collider.onTouchEnd.addListener(onClickDice, this.dice.gameobject);
 		}
 	}

@@ -16,6 +16,10 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewEventCenter"], function(bcnewEntity, bc
 		this.onTouchEnd = new bcnewEventCenter.EvtListenerGroup(0);
 		this.onClick = new bcnewEventCenter.EvtListenerGroup(0);
 	}
+		
+	bcnewEntity.regComponent("Collider", function (){
+		return new bcnewCollider.Collider();
+	})
 	
 	Collider.prototype = new bcnewEntity.Component();
 	

@@ -10,6 +10,9 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 		this.dead = false;
 		this.active = true;
 		this.compArr = new Array();
+		this.renderer = null;
+		this.collider = null;
+		this.animation = null;
 		this.transform = new bcnewTransform.Transform();
 		if (window.bcnGameObjectMng != null){
 			this.transform.setParent(bcnGameObjectMng.transform);
@@ -24,6 +27,50 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 		this.compArr.push(component);
 		component.gameobject = this;
 		component.init();
+	}
+	
+	GameObject.prototype.createComp = function(compName) {
+		console.log(compName + "1");
+		switch (compName){
+			case "Collider":
+				if (this.collider != null){
+					return;
+				}
+				break;
+			case "Renderer":
+				if (this.renderer != null){
+					return;
+				}
+				break;
+			case "Animation":
+				if (this.animation != null){
+					return;
+				}
+				break;
+		}
+		
+		var component = bcnewEntity.createComponent(compName);
+		if (component == null){
+			console.log(compName + "2");
+			return;
+		}
+		console.log(component);
+		this.compArr.push(component);
+		
+		switch (compName){
+			case "Collider":
+				this.collider = component;
+				break;
+			case "Renderer":
+				this.renderer = component;
+				break;
+			case "Animation":
+				this.animation = component;
+				break;
+		}
+		component.gameobject = this;
+		component.init();
+		return component;
 	}
 	
 	GameObject.prototype.removeComp = function(component) {
@@ -73,7 +120,6 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 	}
 	
 	GameObject.prototype.lateUpdate = function (){
-		//console.log("GameObject->onLateUpdate:" + this.name);
 		for (var idx = 0; idx < this.compArr.length; ++idx){
 			if (this.compArr[idx] == null){
 				continue;

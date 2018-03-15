@@ -180,12 +180,52 @@ define(function (){
 	Component.prototype.lateUpdate = function(){
 	};
 	
+	function ComponentFactory(){
+		this.compTempList = new Array();
+	}
+	
+	ComponentFactory.prototype.regComponent = function(compName, factoryFunc) {
+		for (var idx = 0; idx < this.compTempList.length; ++idx){
+			if (this.compTempList[idx].id == compName){
+				alert("duplicate register comp:" + compName);
+				this.compTempList[idx].func = factoryFunc;
+				return;
+			}
+		}
+		this.compTempList.push({id:compName, func:factoryFunc});
+	}
+	
+	ComponentFactory.prototype.createComponent = function(compName) {
+		for (var idx = 0; idx < this.compTempList.length; ++idx){
+			if (this.compTempList[idx].id == compName){
+				return this.compTempList[idx].func();
+			}
+		}
+		console.log("can't find comp:" + compName);
+		return null;
+	}
+	
+	function regComponent(compName, factoryFunc) {
+		if (window.bcnCompFactory == null){
+			window.bcnCompFactory = new ComponentFactory();
+		}
+		window.bcnCompFactory.regComponent(compName, factoryFunc);
+	}
+	
+	function createComponent(compName){
+		if (window.bcnCompFactory != null){
+			return window.bcnCompFactory.createComponent(compName);
+		}
+	}
+	
 	return {
 		Vector2 : Vector2,
 		Rect : Rect,
 		Entity : Entity,
 		ServiceCenter : ServiceCenter,
-		Component : Component
+		Component : Component,
+		regComponent : regComponent,
+		createComponent : createComponent,
 		};
 	
 });

@@ -38,6 +38,7 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 		this.dead = false;
 		this.id = id;
 		this.sprite = null;
+		console.log(this.setSprite);
 	}
 	
 	Renderer.prototype = new bcnewEntity.Component();
@@ -84,6 +85,10 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 					bound.height);
 		}
 	}
+		
+	bcnewEntity.regComponent("Renderer", function (){
+		return new bcnewRender.Renderer();
+	})
 	
 	function RenderService() {
 		bcnewEntity.Entity.call(this, "RenderService");
