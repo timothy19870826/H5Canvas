@@ -135,7 +135,7 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			this.lossyScale.x *= rootScale.x;
 			this.lossyScale.y *= rootScale.y;
 		}
-		freshChildScale();
+		this.freshChildScale();
 	}
 	
 	Transform.prototype.getLocalScale = function() {
@@ -231,6 +231,10 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 			this.child[idx].freshChildDepth();
 		}
 	}
+	
+	bcnewEntity.regComponent("Transform", function (){
+		return new bcnewTransform.Transform();
+	})
 	
 	return {
 		Transform : Transform

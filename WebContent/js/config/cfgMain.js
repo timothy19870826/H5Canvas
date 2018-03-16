@@ -4,6 +4,21 @@
 define(["bcnew/bcnewAsset"],
 function(bcnewAsset) {
 	
+
+	var mainImage = new Image();
+	mainImage.onload = function() {
+		this.ready = true;
+	};
+	mainImage.src = "Images/main.png";
+	bcnewAsset.regAsset("Images/main.png", mainImage);
+
+	var nbgImage = new Image();
+	nbgImage.onload = function() {
+		this.ready = true;
+	};
+	nbgImage.src = "Images/nbg.png";
+	bcnewAsset.regAsset("Images/nbg.png", nbgImage);
+	
 	var mainCfg = {
 	    "name":"Texture",
 	    "rendererCfg":{
@@ -991,5 +1006,376 @@ function(bcnewAsset) {
 	    ]
 	}
 	
+	bcnewAsset.regAsset("mainCfg", mainCfg);
 	
+	var mainSpriteCfg = 
+	[
+        {
+            "name":"dog_icon0",
+            "x":0,
+            "y":851,
+            "width":128,
+            "height":173,
+        },
+        {
+            "name":"dog_icon1",
+            "x":0,
+            "y":675,
+            "width":128,
+            "height":173,
+        },
+        {
+            "name":"dog_icon2",
+            "x":0,
+            "y":851,
+            "width":128,
+            "height":173,
+        },
+        {
+            "name":"kuang_again",
+            "x":339,
+            "y":559,
+            "width":102,
+            "height":102,
+        },
+        {
+            "name":"kuang_dj",
+            "x":349,
+            "y":801,
+            "width":102,
+            "height":102,
+        },
+        {
+            "name":"kuang_empty",
+            "x":115,
+            "y":241,
+            "width":102,
+            "height":102,
+        },
+        {
+            "name":"kuang_hb",
+            "x":448,
+            "y":696,
+            "width":102,
+            "height":102,
+        },
+        {
+            "name":"kuang_kg",
+            "x":444,
+            "y":559,
+            "width":102,
+            "height":102,
+        },
+        {
+            "name":"kuang_mj",
+            "x":339,
+            "y":454,
+            "width":102,
+            "height":102,
+        },
+        {
+            "name":"shaizi_01",
+            "x":131,
+            "y":906,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_anim_0",
+            "x":230,
+            "y":422,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_anim_1",
+            "x":0,
+            "y":11,
+            "width":112,
+            "height":106,
+        },
+        {
+            "name":"shaizi_anim_2",
+            "x":111,
+            "y":126,
+            "width":112,
+            "height":108,
+        },
+        {
+            "name":"shaizi_anim_3",
+            "x":0,
+            "y":237,
+            "width":112,
+            "height":106,
+        },
+        {
+            "name":"shaizi_anim_4",
+            "x":115,
+            "y":9,
+            "width":108,
+            "height":114,
+        },
+        {
+            "name":"shaizi_anim_5",
+            "x":0,
+            "y":346,
+            "width":112,
+            "height":106,
+        },
+        {
+            "name":"shaizi_anim_6",
+            "x":0,
+            "y":455,
+            "width":112,
+            "height":108,
+        },
+        {
+            "name":"shaizi_anim_7",
+            "x":0,
+            "y":566,
+            "width":112,
+            "height":106,
+        },
+        {
+            "name":"shaizi_anim_8",
+            "x":0,
+            "y":120,
+            "width":108,
+            "height":114,
+        },
+        {
+            "name":"shaizi_anim_9",
+            "x":115,
+            "y":566,
+            "width":112,
+            "height":106,
+        },
+        {
+            "name":"shaizi_anim_10",
+            "x":115,
+            "y":346,
+            "width":112,
+            "height":108,
+        },
+        {
+            "name":"shaizi_anim_11",
+            "x":115,
+            "y":457,
+            "width":112,
+            "height":106,
+        },
+        {
+            "name":"shaizi_anim_12",
+            "x":335,
+            "y":301,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_02",
+            "x":226,
+            "y":225,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_03",
+            "x":131,
+            "y":785,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_04",
+            "x":240,
+            "y":785,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_05",
+            "x":240,
+            "y":906,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_06",
+            "x":230,
+            "y":664,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_disable",
+            "x":226,
+            "y":104,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_disable02",
+            "x":335,
+            "y":59,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_disable03",
+            "x":339,
+            "y":664,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_disable04",
+            "x":349,
+            "y":906,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_disable05",
+            "x":335,
+            "y":180,
+            "width":106,
+            "height":118,
+        },
+        {
+            "name":"shaizi_disable06",
+            "x":230,
+            "y":543,
+            "width":106,
+            "height":118,
+        }
+	]
+
+	bcnewAsset.regAsset("main", mainSpriteCfg);
+	
+	var dogAnim =
+	{
+		"img":"Images/main.png",
+		"interval":150,
+		"spriteFmt":"dog_icon",
+		"count":3,
+	}	
+	bcnewAsset.regAsset("dogAnim", dogAnim);
+	
+	var diceAnim =
+	{
+		"img":"Images/main.png",
+		"interval":20,
+		"spriteFmt":"shaizi_anim_",
+		"count":13,
+	}		
+	bcnewAsset.regAsset("diceAnim", diceAnim);
+	
+	var dice1 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_01",
+		"count":1,
+	}		
+	bcnewAsset.regAsset("dice1", dice1);
+	
+	var dice2 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_02",
+		"count":1,
+	}		
+	bcnewAsset.regAsset("dice2", dice2);
+	
+	var dice3 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_03",
+		"count":1,
+	}		
+	bcnewAsset.regAsset("dice3", dice3);
+	
+	var dice4 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_04",
+		"count":1,
+	}		
+	bcnewAsset.regAsset("dice4", dice4);
+	
+	var dice5 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_05",
+		"count":1,
+	}		
+	bcnewAsset.regAsset("dice5", dice5);
+	
+	var dice6 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_06",
+		"count":1,
+	}		
+	bcnewAsset.regAsset("dice6", dice6);
+	
+	var diceDisable1 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_disable01",
+		"count":1,
+	}		
+	bcnewAsset.regAsset("diceDisable1", diceDisable1);
+	
+	var diceDisable2 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_disable02",
+		"count":1,
+	}	
+	bcnewAsset.regAsset("diceDisable2", diceDisable2);	
+	
+	var diceDisable3 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_disable03",
+		"count":1,
+	}		
+	bcnewAsset.regAsset("diceDisable3", diceDisable3);	
+	
+	var diceDisable4 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_disable04",
+		"count":1,
+	}		
+	bcnewAsset.regAsset("diceDisable4", diceDisable4);	
+	
+	var diceDisable5 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_disable05",
+		"count":1,
+	}	
+	bcnewAsset.regAsset("diceDisable5", diceDisable5);	
+	
+	var diceDisable6 =
+	{
+		"img":"Images/main.png",
+		"interval":0,
+		"spriteFmt":"shaizi_disable06",
+		"count":1,
+	}
+	bcnewAsset.regAsset("diceDisable6", diceDisable6);	
+
 })

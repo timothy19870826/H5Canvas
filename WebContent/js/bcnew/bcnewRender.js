@@ -2,33 +2,33 @@
  * 
  */
 
-define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnewResource) {
+define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 
 	
-	function Sprite(asset, x, y, width, height){
-		this.asset = asset;
+	function Sprite(image, x, y, width, height){
+		this.image = image;
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		this.ref = 0;
 	}
 	
 	Sprite.prototype.autoSize = function() {
 		if (this.width == null || this.height == null || this.width == 0 || this.height == 0) {
-			console.log(this.asset);
-			if (this.asset.isReady()){
-				this.width = this.asset.image.width;
-				this.height = this.asset.image.height;
+			if (this.image.assetReady){
+				this.width = this.image.width;
+				this.height = this.image.height;
 			}
 		}
 	}
 	
 	Sprite.prototype.isReady = function() {
-		return this.asset != null && this.asset.ready;
+		return this.image != null && this.image.assetReady;
 	}
 	
 	Sprite.prototype.getImage = function() {
-		return this.asset.image;
+		return this.image;
 	}
 	
 	function Renderer(id){
@@ -38,7 +38,6 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 		this.dead = false;
 		this.id = id;
 		this.sprite = null;
-		console.log(this.setSprite);
 	}
 	
 	Renderer.prototype = new bcnewEntity.Component();
@@ -50,6 +49,7 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 	}
 	
 	Renderer.prototype.destroy = function() {
+		this.setSprite(null);
 		if (bcnRenderService != null){
 			bcnRenderService.removeRenderer(this);
 		}
@@ -60,7 +60,16 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewResource"], function(bcnewEntity, bcnew
 	}
 	
 	Renderer.prototype.setSprite = function(sprite) {
+		if (this.sprite != null){
+			this.sprite.ref--;
+			if (this.sprite.ref == 0){
+				bcnAssetMng.unloadAsset(this.sprite.image.assetId);
+			}
+		}
 		this.sprite = sprite;
+		if (this.sprite != null){
+			this.sprite.ref++;
+		}
 	}
 	
 	Renderer.prototype.getSprite = function(){

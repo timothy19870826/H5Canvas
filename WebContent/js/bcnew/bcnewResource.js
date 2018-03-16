@@ -2,42 +2,6 @@
  * 
  */
 define(["bcnew/bcnewEntity"], function(bcnewEntity) {
-
-	var AssetType = {};
-	AssetType.none = 0;
-	AssetType.image = 1;
-	AssetType.audio = 2;
-	
-	function ResAsset(assetType){
-		this.assetType = assetType;
-		this.ref = 1;
-		this.src = "";
-	}
-	
-	ResAsset.prototype.release = function() {
-		this.ref--;
-		if (this.ref <= 0 && bcnResourceMng != null){
-			bcnResourceMng.clearAsset(this);
-		}
-	}
-
-	function ImageAsset(src){
-		ResAsset.call(this, AssetType.image);
-		this.assetType = AssetType.image;
-		this.ref = 1;
-		this.image = new Image();
-		this.image.onload = function() {
-			this.ready = true;
-		};
-		this.src = src;
-		this.image.src = src;
-	}
-	
-	ImageAsset.prototype = new ResAsset();
-	
-	ImageAsset.prototype.isReady = function() {
-		return this.image.ready;
-	}
 	
 	function ResourceMng(){
 		bcnewEntity.Entity.call(this, "ResourceMng");
@@ -54,24 +18,30 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	
 	ResourceMng.prototype = new bcnewEntity.Entity();
 	
-	ResourceMng.prototype.findAsset = function(src) {
+	ResourceMng.prototype.findAsset = function(assetId) {
 		for (var idx = 0; idx < this.assetArr.length; ++idx) {
-			if (this.assetArr[idx].src == src){
+			if (this.assetArr[idx].assetId == assetId){
 				return this.assetArr[idx];
 			}
 		}
 		return null;
 	}
 	
-	ResourceMng.prototype.loadAsset = function(src) {
-		var asset = this.findAsset(src);
+	ResourceMng.prototype.loadAsset = function(assetId) {
+		var asset = this.findAsset(assetId);
 		if (asset != null){
-			asset.ref++;
+			asset.assetRef++;
 			return asset;
 		}
-		asset = new ImageAsset(src);
-		this.assetArr.push(asset);
-		return asset;
+		var image = new Image();
+		image.onload = function() {
+			this.assetReady = true;
+		};
+		image.src = assetId;
+		image.assetId = assetId;
+		image.assetRef = 1;
+		this.assetArr.push(image);
+		return image;
 	} 
 	
 	ResourceMng.prototype.clearAsset = function(asset) {
@@ -92,8 +62,6 @@ define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 	}
 	
 	return {
-		ResAsset : ResAsset,
-		ImageAsset : ImageAsset,
 		ResourceMng : ResourceMng
 	}
 })

@@ -1,7 +1,7 @@
 /**
  * 
  */
-define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcnewTransform) {
+define(["bcnew/bcnewEntity"], function(bcnewEntity) {
 
 	function GameObject(name){
 		bcnewEntity.Entity.call(this, "GameObject", name);
@@ -13,11 +13,10 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 		this.renderer = null;
 		this.collider = null;
 		this.animation = null;
-		this.transform = new bcnewTransform.Transform();
+		this.transform = this.createComp("Transform");
 		if (window.bcnGameObjectMng != null){
 			this.transform.setParent(bcnGameObjectMng.transform);
 		}
-		this.addComp(this.transform);
 	}
 	
 	GameObject.prototype.addComp = function(component) {
@@ -30,7 +29,6 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 	}
 	
 	GameObject.prototype.createComp = function(compName) {
-		console.log(compName + "1");
 		switch (compName){
 			case "Collider":
 				if (this.collider != null){
@@ -51,10 +49,8 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 		
 		var component = bcnewEntity.createComponent(compName);
 		if (component == null){
-			console.log(compName + "2");
 			return;
 		}
-		console.log(component);
 		this.compArr.push(component);
 		
 		switch (compName){
@@ -71,6 +67,10 @@ define(["bcnew/bcnewEntity", "bcnew/bcnewTransform"], function(bcnewEntity, bcne
 		component.gameobject = this;
 		component.init();
 		return component;
+	}
+	
+	GameObject.prototype.addCompByName = function(compName) {
+		return this.createComp(compName);
 	}
 	
 	GameObject.prototype.removeComp = function(component) {

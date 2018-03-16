@@ -30,8 +30,7 @@ function (bcnew, logics){
 			arg.transform.position.x = arg.transform.position.x + 100;
 		}, this.dog); 
 				
-		var go = logicGoFactory.createGOByConfig(logicMainConfig.mainLayout);
-		go.name = "main";
+		var go = logicGoFactory.createGO(logicMainConfig.mainLayout);
 		
 		this.smallDog = go.transform.findChild("dog");
 		if (this.smallDog != null){
