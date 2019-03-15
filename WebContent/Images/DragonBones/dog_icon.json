@@ -1,0 +1,1 @@
+{"name":"dog_icon","version":"4.5","armature":[{"name":"armatureName","aabb":{"width":128,"height":174},"bone":[{"name":"root"}],"slot":[{"name":"图层_1","parent":"root"}],"skin":[{"slot":[{"name":"图层_1","display":[{"name":"图层_1","transform":{"y":0.5},"pivot":{"x":0.5,"y":0.5}}]}]}]}]}
